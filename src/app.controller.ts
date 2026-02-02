@@ -1,20 +1,11 @@
-import {
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Redirect,
-  Res,
-} from '@nestjs/common';
-import { AppService } from './app.service';
-import type { Response } from 'express';
+import { Controller, Get } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
+  constructor(private readonly config: ConfigService) {}
   @Get()
-  getHello(@Res() res: Response): void {
-    res.status(200).send(this.appService.getHello());
+  getHello(): string {
+    return 'API is running';
   }
 }

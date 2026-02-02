@@ -1,45 +1,45 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import Auth from 'src/auth/decorators/auth.decorator';
+import { CurrentUser } from './decorators/current-user.decorator';
+import type { JwtPayload } from 'src/utils/types/types';
+import AuthRoles from 'src/auth/decorators/roles.decorator';
+import { UserRole } from 'src/utils/enums';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
   @Get()
-  findAll() {
+  @AuthRoles(UserRole.ADMIN)
+  fetchAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  fetchOne(@Param('id') id: string) {
+    return this.userService.findById(+id);
   }
 
-  @Patch(':id')
+  @Patch()
+  @AuthRoles()
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: JwtPayload,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.update(+id, updateUserDto);
+    return this.userService.update(user.id, updateUserDto);
+  }
+
+  @Get('profile/me')
+  @Auth()
+  async fetchProfile(@CurrentUser() user: User): Promise<User> {
+    return await this.userService.findById(user.id);
   }
 
   @Delete(':id')
+  @Auth()
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
