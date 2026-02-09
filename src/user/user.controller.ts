@@ -1,4 +1,14 @@
-import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Post,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import Auth from 'src/auth/decorators/auth.decorator';
@@ -7,8 +17,13 @@ import type { JwtPayload } from 'src/utils/types/types';
 import AuthRoles from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/utils/enums';
 import { User } from './entities/user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { randomUUID } from 'crypto';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { FileUploadDto } from 'src/storage/dto/file-upload.dto';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -42,5 +57,38 @@ export class UserController {
   @Auth()
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
+  }
+
+  @Post('avatar')
+  @Auth()
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/images',
+        filename: (req, file, cb) => {
+          const filename = Date.now() + '-' + randomUUID() + file.originalname;
+          cb(null, filename);
+        },
+      }),
+      limits: { fileSize: 2 * 1024 * 1024 },
+      fileFilter: (req, file, cb) => {
+        if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          cb(null, true);
+        } else {
+          cb(new Error('Only image files are allowed!'), false);
+        }
+      },
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Avatar upload',
+    type: FileUploadDto,
+  })
+  uploadAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: User,
+  ) {
+    return this.userService.updateAvatar(user.id, file);
   }
 }

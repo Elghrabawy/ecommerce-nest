@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReviewsModule } from './reviews/reviews.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { StorageModule } from './storage/storage.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
         logging: true,
       }),
     }),
+    StorageModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [

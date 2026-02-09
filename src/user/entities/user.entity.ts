@@ -1,8 +1,8 @@
 import { Exclude, Expose } from 'class-transformer';
-import { Product } from 'src/product/entities/product.entity';
-import { Review } from 'src/reviews/entities/review.entity';
-import { CURRENT_TIMESTAMP } from 'src/utils/constants';
-import { UserRole } from 'src/utils/enums';
+import { Product } from '../../product/entities/product.entity';
+import { Review } from '../../reviews/entities/review.entity';
+import { CURRENT_TIMESTAMP } from '../../utils/constants';
+import { UserRole } from '../../utils/enums';
 import {
   Column,
   CreateDateColumn,
@@ -33,6 +33,9 @@ export class User {
   get isAdmin(): boolean {
     return this.role === UserRole.ADMIN;
   }
+
+  @Column({ type: 'text', nullable: true })
+  avatar_url: string | null;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   created_at: Date;

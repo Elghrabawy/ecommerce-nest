@@ -10,7 +10,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+
 import * as bcrypt from 'bcrypt';
+
+import { join } from 'path';
+import { unlinkSync } from 'fs';
 
 @Injectable()
 export class UserService {
@@ -22,7 +26,10 @@ export class UserService {
   async create(createUserDto: RegisterUserDto): Promise<User> {
     try {
       // if user with email already exists
-      if (await this.findUserByEmail(createUserDto.email)) {
+      const existingUser = await this.userRepository.findOne({
+        where: { email: createUserDto.email },
+      });
+      if (existingUser) {
         console.log('Email already in use:', createUserDto.email);
         throw new BadRequestException('Email already in use');
       }
@@ -119,7 +126,9 @@ export class UserService {
 
       if (updateUserDto.email && user.email !== updateUserDto.email) {
         // check if email is already in use
-        const existingUser = await this.findUserByEmail(updateUserDto.email);
+        const existingUser = await this.userRepository.findOne({
+          where: { email: updateUserDto.email },
+        });
         if (existingUser) {
           throw new BadRequestException('Email already in use');
         }
@@ -141,6 +150,82 @@ export class UserService {
         error,
       );
     }
+  }
+
+  async setProfileImage(id: number, filename: string): Promise<User> {
+    try {
+      const user: User | null = await this.userRepository.findOne({
+        where: { id },
+      });
+
+      if (!user) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+
+      await this.removeProfileImage(id).catch((error) => {
+        console.log(
+          'Failed to remove old profile image for user with id',
+          id,
+          error,
+        );
+      });
+      user.avatar_url = filename;
+
+      await this.userRepository.save(user);
+      return user;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `Could not set profile image for user with id ${id}`,
+        error,
+      );
+    }
+  }
+
+  async removeProfileImage(id: number): Promise<User> {
+    try {
+      const user: User | null = await this.userRepository.findOne({
+        where: { id },
+      });
+
+      if (!user) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+
+      if (user.avatar_url === null) {
+        throw new BadRequestException(
+          'User does not have a profile image to remove',
+        );
+      }
+
+      const imagePath = join(process.cwd(), 'uploads/images', user.avatar_url);
+
+      unlinkSync(imagePath);
+
+      user.avatar_url = null;
+
+      await this.userRepository.save(user);
+      return user;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `Could not remove profile image for user with id ${id}`,
+        error,
+      );
+    }
+  }
+
+  async updateAvatar(id: number, file: Express.Multer.File): Promise<User> {
+    if (!file) {
+      throw new BadRequestException('File not provided');
+    }
+
+    const user = await this.setProfileImage(id, file.filename);
+    return user;
   }
 
   remove(id: number) {

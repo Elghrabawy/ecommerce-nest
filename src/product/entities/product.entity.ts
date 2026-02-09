@@ -1,6 +1,6 @@
-import { Review } from 'src/reviews/entities/review.entity';
-import { User } from 'src/user/entities/user.entity';
-import { CURRENT_TIMESTAMP } from 'src/utils/constants';
+import { Review } from '../../reviews/entities/review.entity';
+import { User } from '../../user/entities/user.entity';
+import { CURRENT_TIMESTAMP } from '../../utils/constants';
 import {
   Column,
   CreateDateColumn,
