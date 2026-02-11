@@ -8,29 +8,25 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { StorageModule } from './storage/storage.module';
 import { MailModule } from './mail/mail.module';
+import { AddressModule } from './address/address.module';
+import dbConfig from './config/db.config';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
     ReviewsModule,
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: `.env.development` }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.development`,
+      load: [dbConfig],
+    }),
     TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('DB_HOST') || 'localhost',
-        port: config.get<number>('DB_PORT') || 5432,
-        username: config.get('DB_USERNAME') || 'postgres',
-        password: config.get('DB_PASSWORD') || '123',
-        database: config.get('DB_DATABASE') || 'nestjs',
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        // synchronize: true,
-        logging: true,
-      }),
+      useFactory: dbConfig,
     }),
     StorageModule,
     MailModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [

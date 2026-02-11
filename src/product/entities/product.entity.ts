@@ -1,44 +1,35 @@
-import { Review } from '../../reviews/entities/review.entity';
-import { User } from '../../user/entities/user.entity';
-import { CURRENT_TIMESTAMP } from '../../utils/constants';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-
+import { OrderItem } from 'src/order/entities/order-item.entity';
+import { Review } from 'src/reviews/entities/review.entity';
+import { BaseEntity } from 'src/utils/base.entity';
+import { Entity, Column, Index, VersionColumn, OneToMany } from 'typeorm';
 @Entity('products')
-export class Product {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class Product extends BaseEntity {
   @Column()
+  @Index({ fulltext: true }) // Helps with basic search
   name: string;
+
+  @Column({ unique: true })
+  slug: string;
 
   @Column('text')
   description: string;
 
-  @Column('decimal')
+  // Precision 10, scale 2 means: 12345678.99
+  @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
-  @Column()
+  @Column('int')
   stock: number;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
-  created_at: Date;
+  @Column('jsonb', { nullable: true })
+  images: string[];
 
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => CURRENT_TIMESTAMP,
-    onUpdate: CURRENT_TIMESTAMP,
-  })
-  updated_at: Date;
+  // Optimistic Locking: Increment automatically on save
+  @VersionColumn()
+  version: number;
 
-  @ManyToOne((type) => User, (user) => user.products)
-  user: User;
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
+  orderItems: OrderItem[];
 
   @OneToMany((type) => Review, (review) => review.product)
   reviews: Review[];

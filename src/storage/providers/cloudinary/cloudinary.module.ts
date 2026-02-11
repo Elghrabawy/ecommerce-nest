@@ -5,6 +5,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { CloudinaryController } from './cloudinary.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { ConfigService } from '@nestjs/config';
+import cloudinaryConfig from 'src/config/cloudinary.config';
 
 @Module({
   imports: [
@@ -24,13 +25,8 @@ import { ConfigService } from '@nestjs/config';
     CloudinaryService,
     {
       provide: 'CLOUDINARY',
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        cloudinary.config({
-          cloud_name: config.get<string>('CLOUDINARY_CLOUD_NAME'),
-          api_key: config.get<string>('CLOUDINARY_API_KEY'),
-          api_secret: config.get<string>('CLOUDINARY_API_SECRET'),
-        });
+      useFactory: () => {
+        cloudinary.config(cloudinaryConfig());
         return cloudinary; // Return the configured cloudinary instance
       },
     },

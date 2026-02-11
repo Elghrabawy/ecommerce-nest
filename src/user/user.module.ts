@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from 'src/utils/interceptors/response.interceptor';
+import { AuthService } from 'src/auth/auth.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), forwardRef(() => AuthModule)],
