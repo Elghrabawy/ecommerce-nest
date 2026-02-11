@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, Index } from 'typeorm';
-import { BaseEntity } from '../../../common/utils/base.entity';
+import { BaseEntity } from '../../../common/entities';
 import { User } from '../../user/entities/user.entity';
 import { AddressType } from '../../../common/utils/enums';
 

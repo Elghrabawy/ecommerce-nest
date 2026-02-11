@@ -1,4 +1,4 @@
-import { BaseEntity } from 'src/common/utils/base.entity';
+import { BaseEntity } from 'src/common/entities';
 import { Entity, Column, ManyToOne } from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from 'src/modules/product/entities/product.entity';

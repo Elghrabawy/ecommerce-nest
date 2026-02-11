@@ -1,6 +1,6 @@
 import { OrderItem } from 'src/modules/order/entities/order-item.entity';
 import { Review } from 'src/modules/reviews/entities/review.entity';
-import { BaseEntity } from 'src/common/utils/base.entity';
+import { BaseEntity } from 'src/common/entities';
 import { Entity, Column, Index, VersionColumn, OneToMany } from 'typeorm';
 @Entity('products')
 export class Product extends BaseEntity {

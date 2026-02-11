@@ -3,7 +3,7 @@ import { Review } from '../../reviews/entities/review.entity';
 import { Order } from '../../order/entities/order.entity';
 import { UserRole } from '../../../common/utils/enums';
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
-import { BaseEntity } from 'src/common/utils/base.entity';
+import { BaseEntity } from 'src/common/entities';
 import { Wishlist } from 'src/modules/wishlist/entities/wishlist.entity';
 import { Cart } from 'src/modules/cart/entities/cart.entity';
 import { Address } from 'src/modules/address/entities/address.entity';

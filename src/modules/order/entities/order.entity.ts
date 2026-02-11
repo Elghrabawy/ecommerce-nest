@@ -1,5 +1,5 @@
 import { User } from 'src/modules/user/entities/user.entity';
-import { BaseEntity } from 'src/common/utils/base.entity';
+import { BaseEntity } from 'src/common/entities';
 import { OrderStatus } from 'src/common/utils/enums';
 import { Entity, Column, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { OrderItem } from './order-item.entity';
