@@ -10,7 +10,7 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 import Auth from 'src/auth/decorators/auth.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
 import type { JwtPayload } from 'src/utils/types/types';

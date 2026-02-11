@@ -12,7 +12,7 @@ export class Address extends BaseEntity {
   type: AddressType;
 
   @Column()
-  title: string;
+  Title: string;
 
   @Column()
   company: string;

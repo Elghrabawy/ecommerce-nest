@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterUserDto } from 'src/user/dto/register-user.dto';
+import { RegisterUserDto } from 'src/user/dtos/register-user.dto';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { JwtPayload } from 'src/utils/types/types';

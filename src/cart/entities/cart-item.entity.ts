@@ -8,7 +8,7 @@ export class CartItem extends BaseEntity {
   @ManyToOne(() => Cart, (cart) => cart.items, { onDelete: 'CASCADE' })
   cart: Cart;
 
-  @ManyToOne(() => Product, { eager: true }) // Load product details automatically
+  @ManyToOne(() => Product, { eager: true })
   product: Product;
 
   @Column('int')

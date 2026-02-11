@@ -5,7 +5,7 @@ import { Entity, Column, Index, VersionColumn, OneToMany } from 'typeorm';
 @Entity('products')
 export class Product extends BaseEntity {
   @Column()
-  @Index({ fulltext: true }) // Helps with basic search
+  @Index({ fulltext: true }) 
   name: string;
 
   @Column({ unique: true })
@@ -14,7 +14,6 @@ export class Product extends BaseEntity {
   @Column('text')
   description: string;
 
-  // Precision 10, scale 2 means: 12345678.99
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 

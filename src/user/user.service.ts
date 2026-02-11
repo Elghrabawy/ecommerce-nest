@@ -5,8 +5,8 @@ import {
   HttpException,
   NotFoundException,
 } from '@nestjs/common';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { RegisterUserDto } from './dtos/register-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';

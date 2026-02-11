@@ -1,4 +1,8 @@
-import { CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  CreateDateColumn,
+  DeleteDateColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { CURRENT_TIMESTAMP } from './constants';
 
 export abstract class BaseEntity {
