@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { RegisterUserDto } from 'src/modules/user/dtos/register-user.dto';
 import { User } from 'src/modules/user/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
-import { JwtPayload } from 'src/common/utils/types/types';
+import { JwtPayload } from 'src/common/utils/types';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
