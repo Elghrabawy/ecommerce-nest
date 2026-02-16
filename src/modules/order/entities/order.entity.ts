@@ -18,7 +18,7 @@ export class Order extends BaseEntity {
   status: OrderStatus;
 
   @Column({ nullable: true })
-  paymentIntentId: string;
+  paymentIntentId?: string;
 
   @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
   items: OrderItem[];

@@ -10,6 +10,6 @@ export default registerAs('database', (): PostgresConnectionOptions => {
     // NestJS-specific overrides (different entity paths for runtime)
     entities: [__dirname + '../../**/*.entity{.ts,.js}'],
     migrations: [__dirname + '../database/migrations/*{.ts,.js}'],
-    autoLoadEntities: true, // NestJS feature for automatic entity discovery
+    autoLoadEntities: true,
   } as PostgresConnectionOptions;
 });

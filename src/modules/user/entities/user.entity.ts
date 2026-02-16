@@ -29,7 +29,7 @@ export class User extends BaseEntity {
   }
 
   @Column({ type: 'text', nullable: true })
-  avatar_url: string | null;
+  avatar_url?: string;
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];

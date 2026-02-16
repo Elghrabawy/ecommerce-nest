@@ -1,4 +1,3 @@
-
 import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
 
@@ -18,6 +17,8 @@ export function createDatabaseConfig() {
     migrations: ['src/database/migrations/*{.ts,.js}'],
     migrationsTableName: 'migrations',
     migrationsRun: false,
+    seeds: ['src/database/seeds/**/*{.ts,.js}'],
+    factories: ['src/database/seeds/factories/**/*{.ts,.js}'],
   };
 }
 

@@ -29,26 +29,26 @@ export class Payment extends BaseEntity {
   provider: PaymentProvider;
 
   @Column({ nullable: true })
-  transactionId: string;
+  transactionId?: string;
 
   @Column({ nullable: true })
-  paymentIntentId: string;
+  paymentIntentId?: string;
 
   @Column({ nullable: true })
-  providerTransactionId: string;
+  providerTransactionId?: string;
 
   @Column('decimal', { precision: 10, scale: 2, nullable: true })
-  refundedAmount: number;
+  refundedAmount?: number;
 
   @Column({ type: 'text', nullable: true })
-  failureReason: string;
+  failureReason?: string;
 
   @Column({ type: 'json', nullable: true })
-  metadata: Record<string, any>;
+  metadata?: Record<string, any>;
 
   @Column({ type: 'timestamp', nullable: true })
-  processedAt: Date;
+  processedAt?: Date;
 
   @Column({ type: 'timestamp', nullable: true })
-  refundedAt: Date;
+  refundedAt?: Date;
 }

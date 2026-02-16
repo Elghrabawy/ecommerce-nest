@@ -21,7 +21,7 @@ export class Address extends BaseEntity {
   streetAddress: string;
 
   @Column({ nullable: true })
-  addressLine2: string;
+  addressLine2?: string;
 
   @Column()
   city: string;
@@ -38,7 +38,7 @@ export class Address extends BaseEntity {
   country: string; // country code
 
   @Column({ nullable: true })
-  phone: string;
+  phone?: string;
 
   @Column({ default: false })
   isDefault: boolean;

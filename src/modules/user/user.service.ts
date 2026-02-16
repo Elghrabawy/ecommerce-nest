@@ -194,7 +194,7 @@ export class UserService {
         throw new NotFoundException(`User with id ${id} not found`);
       }
 
-      if (user.avatar_url === null) {
+      if (!user.avatar_url) {
         throw new BadRequestException(
           'User does not have a profile image to remove',
         );
@@ -204,7 +204,7 @@ export class UserService {
 
       unlinkSync(imagePath);
 
-      user.avatar_url = null;
+      user.avatar_url = undefined;
 
       await this.userRepository.save(user);
       return user;
