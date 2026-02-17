@@ -1,12 +1,10 @@
 import { Faker } from '@faker-js/faker';
 import { Address } from 'src/modules/address/entities/address.entity';
 import { setSeederFactory } from 'typeorm-extension';
-import { AddressType } from 'src/common/utils/enums';
 
 export const AddressFactory = setSeederFactory(Address, (faker: Faker) => {
   const address = new Address();
 
-  address.type = faker.helpers.enumValue(AddressType);
   address.Title = faker.helpers.arrayElement([
     'Home',
     'Office',
@@ -21,7 +19,15 @@ export const AddressFactory = setSeederFactory(Address, (faker: Faker) => {
   address.city = faker.location.city();
   address.state = faker.location.state();
   address.postalCode = faker.location.zipCode();
-  address.country = faker.helpers.arrayElement(['US', 'CA', 'GB', 'DE', 'FR', 'JP', 'AU']);
+  address.country = faker.helpers.arrayElement([
+    'US',
+    'CA',
+    'GB',
+    'DE',
+    'FR',
+    'JP',
+    'AU',
+  ]);
   if (faker.datatype.boolean(0.7)) {
     address.phone = faker.phone.number();
   }

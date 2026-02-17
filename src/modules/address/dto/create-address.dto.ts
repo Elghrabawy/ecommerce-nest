@@ -1,22 +1,13 @@
 import {
   IsString,
   IsOptional,
-  IsBoolean,
   IsEnum,
   MaxLength,
   IsPhoneNumber,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { AddressType } from '../../../common/utils/enums';
 
 export class CreateAddressDto {
-  @ApiProperty({
-    description: 'Address type',
-    enum: AddressType,
-    example: AddressType.HOME,
-  })
-  @IsEnum(AddressType)
-  type: AddressType;
 
   @ApiProperty({
     description: 'Address title/label',
@@ -86,17 +77,9 @@ export class CreateAddressDto {
 
   @ApiPropertyOptional({
     description: 'Phone number',
-    example: '+1234567890',
+    example: '+201096613552',
   })
   @IsOptional()
   @IsPhoneNumber()
   phone?: string;
-
-  @ApiPropertyOptional({
-    description: 'Is default address',
-    default: false,
-  })
-  @IsOptional()
-  @IsBoolean()
-  isDefault?: boolean;
 }

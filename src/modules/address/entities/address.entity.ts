@@ -1,15 +1,11 @@
 import { Entity, Column, ManyToOne, Index } from 'typeorm';
 import { BaseEntity } from '../../../common/entities';
 import { User } from '../../user/entities/user.entity';
-import { AddressType } from '../../../common/utils/enums';
 
 @Entity('addresses')
 export class Address extends BaseEntity {
   @ManyToOne(() => User, (user) => user.addresses, { onDelete: 'CASCADE' })
   user: User;
-
-  @Column({ type: 'enum', enum: AddressType })
-  type: AddressType;
 
   @Column()
   Title: string;
