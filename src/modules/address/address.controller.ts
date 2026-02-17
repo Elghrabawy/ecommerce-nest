@@ -6,12 +6,18 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AddressService } from './address.service';
 import { Address } from './entities/address.entity';
 import { CreateAddressDto, UpdateAddressDto } from './dto';
+import Auth from '../auth/decorators/auth.decorator';
+import { CurrentUser } from '../user/decorators/current-user.decorator';
+import { User } from '../user/entities/user.entity';
+import AuthAddress from './decorators/auth-address.decorator';
+import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
+import { UserRole } from 'src/common/utils/enums';
 
 @ApiTags('addresses')
 @Controller('addresses')
@@ -24,63 +30,63 @@ export class AddressController {
     status: 200,
     description: 'Addresses retrieved successfully',
   })
-  async getAllAddresses(): Promise<Address[]> {
-    // TODO: Implement get all addresses
+  @Auth()
+  async getAllAddresses(@CurrentUser() user: User): Promise<Address[]> {
+    return await this.addressService.findByUser(user.id);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get address by ID' })
   @ApiResponse({ status: 200, description: 'Address retrieved successfully' })
-  async getAddressById(@Param('id') id: string): Promise<Address> {
-    // TODO: Implement get address by ID
+  @AuthAddress()
+  async getAddressById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Address> {
+    return await this.addressService.findOne(Number(id));
   }
 
   @Post()
   @ApiOperation({ summary: 'Create new address' })
   @ApiResponse({ status: 201, description: 'Address created successfully' })
+  @Auth()
   async createAddress(
     @Body() createAddressDto: CreateAddressDto,
+    @CurrentUser() user: User,
   ): Promise<Address> {
-    // TODO: Implement create address
+    return await this.addressService.create(createAddressDto, user);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update address' })
   @ApiResponse({ status: 200, description: 'Address updated successfully' })
+  @AuthAddress()
   async updateAddress(
     @Param('id') id: string,
     @Body() updateAddressDto: UpdateAddressDto,
   ): Promise<Address> {
-    // TODO: Implement update address
+    return await this.addressService.update(Number(id), updateAddressDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete address' })
   @ApiResponse({ status: 200, description: 'Address deleted successfully' })
+  @AuthAddress()
   async deleteAddress(@Param('id') id: string): Promise<{ message: string }> {
-    // TODO: Implement delete address
+    await this.addressService.remove(Number(id));
+    return { message: 'Address deleted successfully' };
   }
 
-  @Get('user/:userId')
-  @ApiOperation({ summary: 'Get all addresses for specific user' })
-  @ApiResponse({
-    status: 200,
-    description: 'User addresses retrieved successfully',
-  })
-  async getUserAddresses(@Param('userId') userId: string): Promise<Address[]> {
-    // TODO: Implement get user addresses
-  }
-
-  @Get('default/:userId')
-  @ApiOperation({ summary: 'Get default address for user' })
+  @Get('default')
+  @ApiOperation({ summary: 'Get default address for current user' })
   @ApiResponse({
     status: 200,
     description: 'Default address retrieved successfully',
   })
-  async getDefaultAddress(
-    @Param('userId') userId: string,
-  ): Promise<Address | null> {
-    // TODO: Implement get default address
+  @Auth()
+  async getDefaultAddressForCurrentUser(
+    @CurrentUser() user: User,
+  ): Promise<Address> {
+    return await this.addressService.findDefaultAddress(user.id);
   }
 
   @Patch(':id/set-default')
@@ -89,21 +95,32 @@ export class AddressController {
     status: 200,
     description: 'Default address updated successfully',
   })
+  @AuthAddress()
   async setDefaultAddress(@Param('id') id: string): Promise<Address> {
-    // TODO: Implement set default address
+    return await this.addressService.setAsDefault(Number(id));
   }
 
-  @Get('search/location')
-  @ApiOperation({ summary: 'Search addresses by location' })
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Get all addresses for specific user' })
   @ApiResponse({
     status: 200,
-    description: 'Addresses found successfully',
+    description: 'User addresses retrieved successfully',
   })
-  async searchByLocation(
-    @Query('city') city?: string,
-    @Query('state') state?: string,
-    @Query('country') country?: string,
-  ): Promise<Address[]> {
-    // TODO: Implement search by location
+  @AuthRoles(UserRole.ADMIN)
+  async getUserAddresses(@Param('userId') userId: string): Promise<Address[]> {
+    return await this.addressService.findByUser(Number(userId));
+  }
+
+  @Get('default/:userId')
+  @ApiOperation({ summary: 'Get default address for user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Default address retrieved successfully',
+  })
+  @AuthRoles(UserRole.ADMIN)
+  async getDefaultAddress(
+    @Param('userId') userId: string,
+  ): Promise<Address | null> {
+    return await this.addressService.findDefaultAddress(Number(userId));
   }
 }

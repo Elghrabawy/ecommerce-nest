@@ -11,14 +11,14 @@ import { JwtStrategy } from '../strategies/jwt.strategy';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    private readonly jwtStrategy: JwtStrategy,
-  ) {}
+  constructor(private readonly jwtStrategy: JwtStrategy) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     try {
-      const token = this.jwtStrategy.extractTokenFromHeader(request.headers.authorization);
-      
+      const token = this.jwtStrategy.extractTokenFromHeader(
+        request.headers.authorization,
+      );
+
       if (!token) {
         throw new UnauthorizedException('No token provided');
       }

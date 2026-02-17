@@ -1,64 +1,139 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Address } from './entities/address.entity';
 import { CreateAddressDto, UpdateAddressDto } from './dto';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AddressService {
   constructor(
     @InjectRepository(Address)
     private readonly addressRepository: Repository<Address>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async findAll(): Promise<Address[]> {
-    // TODO: Implement get all addresses
+    return await this.addressRepository.find({ relations: ['user'] });
+  }
+
+  async findByUser(userId: number): Promise<Address[]> {
+    return await this.addressRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+    });
   }
 
   async findOne(id: number): Promise<Address> {
-    // TODO: Implement get address by ID
+    const address = await this.addressRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+
+    if (!address) {
+      throw new NotFoundException('Address not found');
+    }
+
+    return address;
   }
 
-  async create(createAddressDto: CreateAddressDto): Promise<Address> {
-    // TODO: Implement create new address
+  async create(
+    createAddressDto: CreateAddressDto,
+    user: User,
+  ): Promise<Address> {
+    const address = this.addressRepository.create({
+      ...createAddressDto,
+      user,
+    });
+
+    return await this.addressRepository.save(address);
   }
 
   async update(
     id: number,
     updateAddressDto: UpdateAddressDto,
   ): Promise<Address> {
-    // TODO: Implement update address
+    const address = await this.addressRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+
+    if (!address) {
+      throw new NotFoundException('Address not found');
+    }
+
+    const updatedAddress = this.addressRepository.merge(
+      address,
+      updateAddressDto,
+    );
+
+    return await this.addressRepository.save(updatedAddress);
   }
 
   async remove(id: number): Promise<void> {
-    // TODO: Implement delete address
+    const address = await this.addressRepository.findOneBy({ id });
+
+    if (!address) {
+      throw new NotFoundException('Address not found');
+    }
+
+    await this.addressRepository.softDelete(id);
   }
 
-  async findByUser(userId: number): Promise<Address[]> {
-    // TODO: Implement get addresses by user
-  }
+  async findDefaultAddress(userId: number): Promise<Address> {
+    const defaultAddress = await this.addressRepository.findOne({
+      where: {
+        user: {
+          id: userId,
+        },
+        isDefault: true,
+      },
+    });
 
-  async findDefaultAddress(userId: number): Promise<Address | null> {
-    // TODO: Implement get default address for user
+    if (!defaultAddress) {
+      throw new NotFoundException('Default address not found for user');
+    }
+    return defaultAddress;
   }
 
   async setAsDefault(id: number): Promise<Address> {
-    // TODO: Implement set address as default
+    const address = await this.addressRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+
+    if (!address) {
+      throw new NotFoundException('Address not found');
+    }
+
+    const userDefaultAddresses = await this.userRepository.findOne({
+      where: {
+        id: address.user.id,
+        addresses: {
+          isDefault: true,
+        },
+      },
+      relations: ['addresses'],
+    });
+
+    if (userDefaultAddresses) {
+      for (const addr of userDefaultAddresses.addresses) {
+        addr.isDefault = false;
+        await this.addressRepository.save(addr);
+      }
+    }
+    await this.addressRepository.save({
+      ...address,
+      isDefault: true,
+    });
+
+    return address;
   }
 
-  async findByLocation(filters: {
-    city?: string;
-    state?: string;
-    country?: string;
-  }): Promise<Address[]> {
-    // TODO: Implement search addresses by location
-  }
-
-  async validateAddress(addressData: CreateAddressDto): Promise<boolean> {
-    // TODO: Implement address validation
-  }
-
-  async getAddressStatistics(userId: number): Promise<any> {
-    // TODO: Implement get address statistics for user
-  }
+  // async getAddressStatistics(userId: number): Promise<any> {
+  // }
 }
