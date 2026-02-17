@@ -14,6 +14,7 @@ import { OrderModule } from './modules/order/order.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { ProductModule } from './modules/product/product.module';
 import { WishlistModule } from './modules/wishlist/wishlist.module';
+import { CategoryModule } from './modules/category/category.module';
 import { StorageProvider } from './common/utils/enums';
 import dbConfig from './config/db.config';
 import minioConfig from './config/minio.config';
@@ -30,6 +31,7 @@ import refreshJwtConfig from './config/refresh-jwt.config';
     PaymentModule,
     ProductModule,
     WishlistModule,
+    CategoryModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.development`,
