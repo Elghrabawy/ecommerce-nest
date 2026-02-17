@@ -9,6 +9,11 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { StorageModule } from './modules/storage/storage.module';
 import { MailModule } from './modules/mail/mail.module';
 import { AddressModule } from './modules/address/address.module';
+import { CartModule } from './modules/cart/cart.module';
+import { OrderModule } from './modules/order/order.module';
+import { PaymentModule } from './modules/payment/payment.module';
+import { ProductModule } from './modules/product/product.module';
+import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { StorageProvider } from './common/utils/enums';
 import dbConfig from './config/db.config';
 import minioConfig from './config/minio.config';
@@ -20,6 +25,11 @@ import refreshJwtConfig from './config/refresh-jwt.config';
     AuthModule,
     UserModule,
     ReviewsModule,
+    CartModule,
+    OrderModule,
+    PaymentModule,
+    ProductModule,
+    WishlistModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.development`,
