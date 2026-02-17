@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Product } from 'src/modules/product/entities/product.entity';
+import { Category } from 'src/modules/category/entities/category.entity';
 import { Address } from 'src/modules/address/entities/address.entity';
 import { Cart } from 'src/modules/cart/entities/cart.entity';
 import { CartItem } from 'src/modules/cart/entities/cart-item.entity';
@@ -12,6 +13,138 @@ import { Payment } from 'src/modules/payment/entities/payment.entity';
 import { Wishlist } from 'src/modules/wishlist/entities/wishlist.entity';
 
 export class MainSeeder implements Seeder {
+  private async createCategories(dataSource: DataSource): Promise<Category[]> {
+    console.log('📂 Creating categories...');
+    const categoryRepo = dataSource.getTreeRepository(Category);
+
+    // Create main categories
+    const electronics = new Category();
+    electronics.name = 'Electronics';
+    electronics.slug = 'electronics';
+    electronics.description = 'Electronic devices and gadgets';
+    electronics.image =
+      'https://via.placeholder.com/400x300/007bff/ffffff?text=Electronics';
+    electronics.isActive = true;
+    electronics.sortOrder = 1;
+
+    const clothing = new Category();
+    clothing.name = 'Clothing';
+    clothing.slug = 'clothing';
+    clothing.description = 'Fashion and apparel for all ages';
+    clothing.image =
+      'https://via.placeholder.com/400x300/28a745/ffffff?text=Clothing';
+    clothing.isActive = true;
+    clothing.sortOrder = 2;
+
+    const home = new Category();
+    home.name = 'Home & Garden';
+    home.slug = 'home-garden';
+    home.description = 'Home improvement and garden supplies';
+    home.image = 'https://via.placeholder.com/400x300/17a2b8/ffffff?text=Home';
+    home.isActive = true;
+    home.sortOrder = 3;
+
+    const sports = new Category();
+    sports.name = 'Sports & Outdoors';
+    sports.slug = 'sports-outdoors';
+    sports.description = 'Sporting goods and outdoor equipment';
+    sports.image =
+      'https://via.placeholder.com/400x300/ffc107/ffffff?text=Sports';
+    sports.isActive = true;
+    sports.sortOrder = 4;
+
+    // Save main categories
+    const savedElectronics = await categoryRepo.save(electronics);
+    const savedClothing = await categoryRepo.save(clothing);
+    const savedHome = await categoryRepo.save(home);
+    const savedSports = await categoryRepo.save(sports);
+
+    // Create subcategories for Electronics
+    const phones = categoryRepo.create({
+      name: 'Smartphones',
+      slug: 'smartphones',
+      description: 'Mobile phones and accessories',
+      image: 'https://via.placeholder.com/400x300/6c757d/ffffff?text=Phones',
+      isActive: true,
+      sortOrder: 1,
+      parent: savedElectronics,
+    });
+
+    const laptops = categoryRepo.create({
+      name: 'Laptops',
+      slug: 'laptops',
+      description: 'Notebooks and portable computers',
+      image: 'https://via.placeholder.com/400x300/6c757d/ffffff?text=Laptops',
+      isActive: true,
+      sortOrder: 2,
+      parent: savedElectronics,
+    });
+
+    const accessories = categoryRepo.create({
+      name: 'Accessories',
+      slug: 'electronics-accessories',
+      description: 'Electronic accessories and peripherals',
+      image:
+        'https://via.placeholder.com/400x300/6c757d/ffffff?text=Accessories',
+      isActive: true,
+      sortOrder: 3,
+      parent: savedElectronics,
+    });
+
+    // Create subcategories for Clothing
+    const menClothing = categoryRepo.create({
+      name: "Men's Clothing",
+      slug: 'mens-clothing',
+      description: 'Fashion for men',
+      image: 'https://via.placeholder.com/400x300/343a40/ffffff?text=Men',
+      isActive: true,
+      sortOrder: 1,
+      parent: savedClothing,
+    });
+
+    const womenClothing = categoryRepo.create({
+      name: "Women's Clothing",
+      slug: 'womens-clothing',
+      description: 'Fashion for women',
+      image: 'https://via.placeholder.com/400x300/e83e8c/ffffff?text=Women',
+      isActive: true,
+      sortOrder: 2,
+      parent: savedClothing,
+    });
+
+    const shoes = categoryRepo.create({
+      name: 'Shoes',
+      slug: 'shoes',
+      description: 'Footwear for all occasions',
+      image: 'https://via.placeholder.com/400x300/fd7e14/ffffff?text=Shoes',
+      isActive: true,
+      sortOrder: 3,
+      parent: savedClothing,
+    });
+
+    // Save subcategories
+    const savedPhones = await categoryRepo.save(phones);
+    const savedLaptops = await categoryRepo.save(laptops);
+    const savedAccessories = await categoryRepo.save(accessories);
+    const savedMenClothing = await categoryRepo.save(menClothing);
+    const savedWomenClothing = await categoryRepo.save(womenClothing);
+    const savedShoes = await categoryRepo.save(shoes);
+
+    // Return all categories for product assignment
+    return [
+      savedElectronics,
+      savedClothing,
+      savedHome,
+      savedSports,
+      savedPhones,
+      savedLaptops,
+      savedAccessories,
+      savedMenClothing,
+      savedWomenClothing,
+      savedShoes,
+    ];
+  }
+
   async run(
     dataSource: DataSource,
     factoryManager: SeederFactoryManager,
@@ -29,12 +162,24 @@ export class MainSeeder implements Seeder {
     // 1. Create Users (10 users)
     console.log('👤 Creating users...');
     const users = await factoryManager.get(User).saveMany(10);
+    
 
-    // 2. Create Products (50 products)
+    // 2. Create Categories with hierarchical structure
+    const allCategories = await this.createCategories(dataSource);
+
+    // 3. Create Products (50 products) with categories
     console.log('📦 Creating products...');
-    const products = await factoryManager.get(Product).saveMany(50);
+    const products: Product[] = [];
+    for (let i = 0; i < 50; i++) {
+      const randomCategory =
+        allCategories[Math.floor(Math.random() * allCategories.length)];
+      const product = await factoryManager
+        .get(Product)
+        .save({ category: randomCategory });
+      products.push(product);
+    }
 
-    // 3. Create Addresses (2-4 per user)
+    // 4. Create Addresses (2-4 per user)
     console.log('🏠 Creating addresses...');
     const addresses: Address[] = [];
     for (const user of users) {
@@ -45,7 +190,7 @@ export class MainSeeder implements Seeder {
       addresses.push(...userAddresses);
     }
 
-    // 4. Create Carts (1 per user)
+    // 5. Create Carts (1 per user)
     console.log('🛒 Creating carts...');
     const carts: Cart[] = [];
     for (const user of users) {
@@ -53,7 +198,7 @@ export class MainSeeder implements Seeder {
       carts.push(cart);
     }
 
-    // 5. Create Cart Items (0-5 items per cart)
+    // 6. Create Cart Items (0-5 items per cart)
     console.log('🛍️ Creating cart items...');
     for (const cart of carts) {
       const itemCount = Math.floor(Math.random() * 6); // 0-5 items
@@ -67,7 +212,7 @@ export class MainSeeder implements Seeder {
       }
     }
 
-    // 6. Create Wishlists (1 per user with 0-10 products)
+    // 7. Create Wishlists (1 per user with 0-10 products)
     console.log('💝 Creating wishlists...');
     for (const user of users) {
       const wishlist = await factoryManager.get(Wishlist).save({ user });
@@ -83,7 +228,7 @@ export class MainSeeder implements Seeder {
       }
     }
 
-    // 7. Create Reviews (random reviews on products)
+    // 8. Create Reviews (random reviews on products)
     console.log('⭐ Creating reviews...');
     for (let i = 0; i < 200; i++) {
       // 200 total reviews
@@ -107,7 +252,7 @@ export class MainSeeder implements Seeder {
       }
     }
 
-    // 8. Create Orders (2-5 per user)
+    // 9. Create Orders (2-5 per user)
     console.log('📋 Creating orders...');
     const orders: Order[] = [];
     for (const user of users) {
@@ -133,7 +278,7 @@ export class MainSeeder implements Seeder {
       }
     }
 
-    // 9. Create Order Items (1-5 items per order)
+    // 10. Create Order Items (1-5 items per order)
     console.log('📦 Creating order items...');
     let totalOrderValue = 0;
     for (const order of orders) {
@@ -156,7 +301,7 @@ export class MainSeeder implements Seeder {
       totalOrderValue += orderTotal;
     }
 
-    // 10. Create Payments (1 per order)
+    // 11. Create Payments (1 per order)
     console.log('💳 Creating payments...');
     for (const order of orders) {
       await factoryManager.get(Payment).save({

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  Query,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 
@@ -9,14 +18,20 @@ export class CategoryController {
 
   @Get()
   @ApiOperation({ summary: 'Get all categories' })
-  @ApiResponse({ status: 200, description: 'Categories retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Categories retrieved successfully',
+  })
   async getCategories(@Query('includeTree') includeTree?: boolean) {
     // TODO: Implement get all categories with optional tree structure
   }
 
   @Get('tree')
   @ApiOperation({ summary: 'Get categories as tree structure' })
-  @ApiResponse({ status: 200, description: 'Category tree retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Category tree retrieved successfully',
+  })
   async getCategoryTree() {
     // TODO: Implement get category tree structure
   }
@@ -45,7 +60,10 @@ export class CategoryController {
   @Put(':id')
   @ApiOperation({ summary: 'Update category' })
   @ApiResponse({ status: 200, description: 'Category updated successfully' })
-  async updateCategory(@Param('id') id: string, @Body() updateCategoryDto: any) {
+  async updateCategory(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: any,
+  ) {
     // TODO: Implement update category
   }
 
@@ -58,14 +76,20 @@ export class CategoryController {
 
   @Get(':id/products')
   @ApiOperation({ summary: 'Get products by category' })
-  @ApiResponse({ status: 200, description: 'Category products retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Category products retrieved successfully',
+  })
   async getCategoryProducts(@Param('id') id: string, @Query() query: any) {
     // TODO: Implement get products by category with filters
   }
 
   @Get(':id/children')
   @ApiOperation({ summary: 'Get child categories' })
-  @ApiResponse({ status: 200, description: 'Child categories retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Child categories retrieved successfully',
+  })
   async getChildCategories(@Param('id') id: string) {
     // TODO: Implement get child categories
   }

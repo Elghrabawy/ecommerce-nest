@@ -1,6 +1,7 @@
 // Export all seeder factories
 export { UserFactory } from './user.seeder.factory';
 export { ProductFactory } from './product.seeder.factory';
+export { CategoryFactory } from './category.seeder.factory';
 export { AddressFactory } from './address.seeder.factory';
 export { ReviewFactory } from './review.seeder.factory';
 export { CartFactory } from './cart.seeder.factory';

@@ -1,9 +1,18 @@
 import { BaseEntity } from 'src/common/entities';
-import { Entity, Column, Index, OneToMany, ManyToOne, Tree, TreeChildren, TreeParent } from 'typeorm';
+import {
+  Entity,
+  Column,
+  Index,
+  OneToMany,
+  ManyToOne,
+  Tree,
+  TreeChildren,
+  TreeParent,
+} from 'typeorm';
 import { Product } from 'src/modules/product/entities/product.entity';
 
 @Entity('categories')
-@Tree('nested-set')
+@Tree('materialized-path')
 export class Category extends BaseEntity {
   @Column()
   @Index({ fulltext: true })
