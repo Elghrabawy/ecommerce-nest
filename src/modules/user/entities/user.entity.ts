@@ -27,7 +27,7 @@ export class User extends BaseEntity {
   get isAdmin(): boolean {
     return this.role === UserRole.ADMIN;
   }
-
+  
   @Column({ type: 'text', nullable: true })
   avatar_url?: string | null;
 

@@ -12,6 +12,8 @@ import { AddressModule } from './modules/address/address.module';
 import { StorageProvider } from './common/utils/enums';
 import dbConfig from './config/db.config';
 import minioConfig from './config/minio.config';
+import jwtConfig from './config/jwt.config';
+import refreshJwtConfig from './config/refresh-jwt.config';
 
 @Module({
   imports: [
@@ -21,7 +23,7 @@ import minioConfig from './config/minio.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.development`,
-      load: [dbConfig, minioConfig],
+      load: [dbConfig, minioConfig, jwtConfig, refreshJwtConfig],
     }),
     TypeOrmModule.forRootAsync({
       useFactory: dbConfig,

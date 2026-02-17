@@ -6,6 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import type { StringValue } from 'ms';
 import { AuthGuard } from './guards/auth.guard';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { RefreshStrategy } from './strategies/refresh.strategy';
 
 @Module({
   imports: [
@@ -14,15 +16,15 @@ import { AuthGuard } from './guards/auth.guard';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         global: true,
-        secret: config.get<string>('JWT_TOKEN'),
+        secret: config.get<string>('jwt.secret'),
         signOptions: {
-          expiresIn: config.get<StringValue>('JWT_EXPIRES_IN') || '10d',
+          expiresIn: config.get<StringValue>('jwt.expiresIn') || '10d',
         },
       }),
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthGuard],
-  exports: [AuthGuard, JwtModule],
+  providers: [AuthService, AuthGuard, JwtStrategy, RefreshStrategy],
+  exports: [AuthGuard, JwtModule, JwtStrategy, RefreshStrategy],
 })
 export class AuthModule {}
