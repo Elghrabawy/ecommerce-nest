@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CURRENT_TIMESTAMP } from '../utils/constants';
+import { Exclude } from 'class-transformer';
 
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn()
@@ -19,6 +20,7 @@ export abstract class BaseEntity {
   })
   updated_at: Date;
 
+  @Exclude()
   @DeleteDateColumn()
   deleted_at: Date;
 }
