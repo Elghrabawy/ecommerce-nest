@@ -8,6 +8,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -18,8 +19,6 @@ import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/utils/enums';
 import { User } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { randomUUID } from 'crypto';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileUploadDto } from 'src/modules/storage/dto/file-upload.dto';
 
@@ -53,8 +52,9 @@ export class UserController {
     return await this.userService.findById(user.id);
   }
 
-  @Delete(':id')
-  @Auth()
+
+  @Delete()
+  @AuthRoles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
@@ -63,19 +63,17 @@ export class UserController {
   @Auth()
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads/images',
-        filename: (req, file, cb) => {
-          const filename = Date.now() + '-' + randomUUID() + file.originalname;
-          cb(null, filename);
-        },
-      }),
-      limits: { fileSize: 2 * 1024 * 1024 },
+      limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
       fileFilter: (req, file, cb) => {
-        if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+        if (file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
           cb(null, true);
         } else {
-          cb(new Error('Only image files are allowed!'), false);
+          cb(
+            new BadRequestException(
+              'Only image files (jpg, jpeg, png, webp) are allowed!',
+            ),
+            false,
+          );
         }
       },
     }),
@@ -90,5 +88,11 @@ export class UserController {
     @CurrentUser() user: User,
   ) {
     return this.userService.updateAvatar(user.id, file);
+  }
+
+  @Delete('avatar')
+  @Auth()
+  removeAvatar(@CurrentUser() user: User) {
+    return this.userService.removeProfileImage(user.id);
   }
 }

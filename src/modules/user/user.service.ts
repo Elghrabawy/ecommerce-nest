@@ -4,23 +4,25 @@ import {
   InternalServerErrorException,
   HttpException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { RegisterUserDto } from './dtos/register-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { StorageService } from '../storage/storage.service';
 
 import * as bcrypt from 'bcrypt';
 
-import { join } from 'path';
-import { unlinkSync } from 'fs';
-
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly storageService: StorageService,
   ) {}
 
   async create(createUserDto: RegisterUserDto): Promise<User> {
@@ -152,7 +154,7 @@ export class UserService {
     }
   }
 
-  async setProfileImage(id: number, filename: string): Promise<User> {
+  async setProfileImage(id: number, avatarUrl: string): Promise<User> {
     try {
       const user: User | null = await this.userRepository.findOne({
         where: { id },
@@ -162,14 +164,7 @@ export class UserService {
         throw new NotFoundException(`User with id ${id} not found`);
       }
 
-      await this.removeProfileImage(id).catch((error) => {
-        console.log(
-          'Failed to remove old profile image for user with id',
-          id,
-          error,
-        );
-      });
-      user.avatar_url = filename;
+      user.avatar_url = avatarUrl;
 
       await this.userRepository.save(user);
       return user;
@@ -185,6 +180,7 @@ export class UserService {
   }
 
   async removeProfileImage(id: number): Promise<User> {
+    this.logger.log(`Trying to remove profile image for user with id ${id}`);
     try {
       const user: User | null = await this.userRepository.findOne({
         where: { id },
@@ -200,13 +196,21 @@ export class UserService {
         );
       }
 
-      const imagePath = join(process.cwd(), 'uploads/images', user.avatar_url);
+      const filename = user.avatar_url.split('/').pop();
+      this.logger.log(`Attempting to delete file ${filename} from storage`);
+      if (filename) {
+        try {
+          await this.storageService.deleteFile(filename);
+        } catch (error) {
+          console.log('Failed to delete file from storage:', error);
+        }
+      }
 
-      unlinkSync(imagePath);
-
-      user.avatar_url = undefined;
+      user.avatar_url = null;
 
       await this.userRepository.save(user);
+      this.logger.log(`Profile image removed for user with id ${id}`);
+
       return user;
     } catch (error) {
       if (error instanceof HttpException) {
@@ -224,11 +228,20 @@ export class UserService {
       throw new BadRequestException('File not provided');
     }
 
-    const user = await this.setProfileImage(id, file.filename);
-    return user;
+    try {
+      const uploadResult = await this.storageService.uploadFile(file);
+
+      const user = await this.setProfileImage(id, uploadResult.path);
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Failed to upload avatar',
+        error?.message || error,
+      );
+    }
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    console.log(`Received request to remove user with id ${id}`);
   }
 }

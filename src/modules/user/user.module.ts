@@ -6,10 +6,15 @@ import { User } from './entities/user.entity';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from 'src/common/utils/interceptors/response.interceptor';
-import { AuthService } from 'src/modules/auth/auth.service';
+import { StorageModule } from '../storage/storage.module';
+import { StorageProvider } from 'src/common/utils/enums';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), forwardRef(() => AuthModule)],
+  imports: [
+    TypeOrmModule.forFeature([User]), 
+    forwardRef(() => AuthModule),
+    StorageModule.register(StorageProvider.MINIO),
+  ],
   controllers: [UserController],
   providers: [
     UserService,

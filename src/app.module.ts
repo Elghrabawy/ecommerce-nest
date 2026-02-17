@@ -9,7 +9,9 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { StorageModule } from './modules/storage/storage.module';
 import { MailModule } from './modules/mail/mail.module';
 import { AddressModule } from './modules/address/address.module';
+import { StorageProvider } from './common/utils/enums';
 import dbConfig from './config/db.config';
+import minioConfig from './config/minio.config';
 
 @Module({
   imports: [
@@ -19,12 +21,12 @@ import dbConfig from './config/db.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.development`,
-      load: [dbConfig],
+      load: [dbConfig, minioConfig],
     }),
     TypeOrmModule.forRootAsync({
       useFactory: dbConfig,
     }),
-    StorageModule,
+    StorageModule.register(StorageProvider.MINIO),
     MailModule,
     AddressModule,
   ],
