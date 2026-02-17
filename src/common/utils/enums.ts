@@ -6,6 +6,7 @@ export enum UserRole {
 export enum StorageProvider {
   LOCAL = 'local',
   CLOUDINARY = 'cloudinary',
+  MINIO = 'minio',
 }
 
 export enum OrderStatus {

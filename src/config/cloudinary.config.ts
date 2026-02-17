@@ -4,8 +4,8 @@ import { ConfigOptions } from 'cloudinary';
 export default registerAs(
   'cloudinary',
   (): ConfigOptions => ({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'your-cloud-name',
-    api_key: process.env.CLOUDINARY_API_KEY || 'your-api-key',
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
   }),
 );
