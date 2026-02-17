@@ -2,7 +2,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { Review } from '../../reviews/entities/review.entity';
 import { Order } from '../../order/entities/order.entity';
 import { UserRole } from '../../../common/utils/enums';
-import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import { BeforeInsert, Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { BaseEntity } from 'src/common/entities';
 import { Wishlist } from 'src/modules/wishlist/entities/wishlist.entity';
 import { Cart } from 'src/modules/cart/entities/cart.entity';
@@ -27,7 +27,7 @@ export class User extends BaseEntity {
   get isAdmin(): boolean {
     return this.role === UserRole.ADMIN;
   }
-  
+
   @Column({ type: 'text', nullable: true })
   avatar_url?: string | null;
 
@@ -45,4 +45,13 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Address, (address) => address.user, { cascade: true })
   addresses: Address[];
+
+  @BeforeInsert()
+  async hashPassword() {
+    if (this.password_hash) {
+      const bcrypt = await import('bcrypt');
+      const saltRounds = 10;
+      this.password_hash = await bcrypt.hash(this.password_hash, saltRounds);
+    }
+  }
 }
