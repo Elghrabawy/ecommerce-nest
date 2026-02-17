@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Global, Module } from '@nestjs/common';
 import { LocalStorageService } from './providers/local/local.service';
 import { LocalStorageModule } from './providers/local/local.module';
 import { StorageService } from './storage.service';
@@ -8,6 +8,7 @@ import { StorageProvider } from 'src/common/utils/enums';
 import { CloudinaryModule } from './providers/cloudinary/cloudinary.module';
 import { MinioStorageModule } from './providers/minio/minio.module';
 
+@Global()
 @Module({
   imports: [LocalStorageModule, CloudinaryModule, MinioStorageModule],
   controllers: [],
@@ -33,6 +34,7 @@ export class StorageModule {
 
     return {
       module: StorageModule,
+      global: true,
       providers: [{ provide: StorageService, useClass: storageService }],
       exports: [{ provide: StorageService, useClass: storageService }],
     };

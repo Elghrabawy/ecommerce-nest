@@ -37,6 +37,7 @@ import refreshJwtConfig from './config/refresh-jwt.config';
       envFilePath: `.env.development`,
       load: [dbConfig, minioConfig, jwtConfig, refreshJwtConfig],
     }),
+
     TypeOrmModule.forRootAsync({
       useFactory: dbConfig,
     }),
