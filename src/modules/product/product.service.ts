@@ -1,49 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotImplementedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Product } from './entities/product.entity';
+import { CreateProductDto, UpdateProductDto } from './dto';
+import { ProductFilters } from './types/product-filter.interface';
 
 @Injectable()
 export class ProductService {
+  constructor(
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+  ) {}
 
-  async getAllProducts(filters?: any) {
-    // TODO: Implement get all products with optional filters
+  async getAllProducts(filters?: ProductFilters): Promise<Product[]> {
+    throw new NotImplementedException();
   }
 
-  async getProductById(productId: number) {
-    // TODO: Implement get product by ID
+  async getProductById(productId: number): Promise<Product> {
+    throw new NotImplementedException();
   }
 
-  async createProduct(productData: any) {
-    // TODO: Implement create new product
+  async createProduct(productData: CreateProductDto): Promise<Product> {
+    throw new NotImplementedException();
   }
 
-  async updateProduct(productId: number, productData: any) {
-    // TODO: Implement update product
+  async updateProduct(
+    productId: number,
+    productData: UpdateProductDto,
+  ): Promise<Product> {
+    throw new NotImplementedException();
   }
 
-  async deleteProduct(productId: number) {
-    // TODO: Implement delete product
+  async deleteProduct(productId: number): Promise<void> {
+    throw new NotImplementedException();
   }
 
-  async searchProducts(searchTerm: string) {
-    // TODO: Implement search products by name, description, etc.
+  async searchProducts(searchTerm: string): Promise<Product[]> {
+    throw new NotImplementedException();
   }
 
-  async getProductsByCategory(categoryId: number) {
-    // TODO: Implement get products by category
+  async getProductsByCategory(categoryId: number): Promise<Product[]> {
+    throw new NotImplementedException();
   }
 
-  async getProductVariations(productId: number) {
-    // TODO: Implement get product variations (size, color, etc.)
+  async getProductVariations(productId: number): Promise<any[]> {
+    throw new NotImplementedException();
   }
 
-  async updateProductStock(productId: number, quantity: number) {
-    // TODO: Implement update product stock
+  async updateProductStock(
+    productId: number,
+    quantity: number,
+  ): Promise<Product> {
+    throw new NotImplementedException();
   }
 
-  async getFeaturedProducts() {
-    // TODO: Implement get featured products
+  async getFeaturedProducts(): Promise<Product[]> {
+    throw new NotImplementedException();
   }
 
-  async getRelatedProducts(productId: number) {
-    // TODO: Implement get related products
+  async getRelatedProducts(productId: number): Promise<Product[]> {
+    throw new NotImplementedException();
+  }
+
+  async generateSlug(name: string): Promise<string> {
+    throw new NotImplementedException();
+  }
+
+  async getProductStatistics(): Promise<any> {
+    throw new NotImplementedException();
+  }
+
+  async getProductReviews(productId: number): Promise<any[]> {
+    throw new NotImplementedException();
   }
 }
