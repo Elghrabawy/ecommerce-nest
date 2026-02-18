@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Our Platform</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .welcome-message {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333333;
+            margin-bottom: 30px;
+        }
+        .highlight {
+            color: #667eea;
+            font-weight: 600;
+        }
+        .features {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .features h3 {
+            color: #333333;
+            margin-top: 0;
+            font-size: 20px;
+        }
+        .features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .features li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+        }
+        .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: transform 0.2s;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666666;
+            font-size: 14px;
+        }
+        .social-links {
+            margin: 20px 0;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #667eea;
+            text-decoration: none;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Welcome!</h1>
+            <p>Thanks for joining us</p>
+        </div>
+        
+        <div class="content">
+            <div class="welcome-message">
+                <p>Hi <span class="highlight"><%= name %></span>,</p>
+                
+                <p>Welcome! Your account has been created with the email: <strong><%= email %></strong></p>
+                
+                <p>You can now start using our platform.</p>
+            </div>
+
+            <div class="features">
+                <h3>🚀 Getting Started</h3>
+                <ul>
+                    <li>Set up your profile</li>
+                    <li>Browse our products</li>
+                    <li>Update your settings</li>
+                    <li>Start shopping</li>
+                    <li>Get special offers</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="#" class="cta-button">Start Now</a>
+            </div>
+
+            <div class="divider"></div>
+
+            <p style="color: #666666; font-size: 14px; line-height: 1.5;">
+                <strong>Need help?</strong> Contact our support team anytime.
+            </p>
+        </div>
+        
+    </div>
+</body>
+</html>

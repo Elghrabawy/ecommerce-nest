@@ -6,12 +6,15 @@ import { User } from './entities/user.entity';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from 'src/common/utils/interceptors/response.interceptor';
+import { UserSubscriber } from './subscribers/user.subscriber';
+import { MailSubscriber } from '../mail/subscribers/mail.subscriber';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), forwardRef(() => AuthModule)],
   controllers: [UserController],
   providers: [
     UserService,
+    UserSubscriber,
     { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor<User> },
   ],
   exports: [UserService],

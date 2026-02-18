@@ -20,6 +20,7 @@ import dbConfig from './config/db.config';
 import minioConfig from './config/minio.config';
 import jwtConfig from './config/jwt.config';
 import refreshJwtConfig from './config/refresh-jwt.config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import refreshJwtConfig from './config/refresh-jwt.config';
     StorageModule.register(StorageProvider.MINIO),
     MailModule,
     AddressModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

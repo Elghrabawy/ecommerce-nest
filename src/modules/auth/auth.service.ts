@@ -12,6 +12,8 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshStrategy } from './strategies/refresh.strategy';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UserCreatedEvent } from '../mail/events/mail.events';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +21,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtStrategy: JwtStrategy,
     private readonly refreshStrategy: RefreshStrategy,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async registerUser(registerUserDto: RegisterUserDto): Promise<JwtResponse> {
@@ -26,6 +29,13 @@ export class AuthService {
       console.log('Starting user registration...');
       const user: User = await this.userService.create(registerUserDto);
       console.log('User created successfully:', user.id);
+
+      // Emit user.created event after successful registration
+      const x = this.eventEmitter.emit(
+        'user.created',
+        new UserCreatedEvent(user.email, user.name),
+      );
+      console.log('User created event emitted:', x);
 
       // Generate tokens using separate strategies
       const payload = this.jwtStrategy.createPayload(user);

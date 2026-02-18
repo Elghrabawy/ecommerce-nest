@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { OrderService } from './order.service';
 
@@ -30,8 +38,14 @@ export class OrderController {
 
   @Put(':id/status')
   @ApiOperation({ summary: 'Update order status' })
-  @ApiResponse({ status: 200, description: 'Order status updated successfully' })
-  async updateOrderStatus(@Param('id') id: string, @Body() updateStatusDto: any) {
+  @ApiResponse({
+    status: 200,
+    description: 'Order status updated successfully',
+  })
+  async updateOrderStatus(
+    @Param('id') id: string,
+    @Body() updateStatusDto: any,
+  ) {
     // TODO: Implement update order status
   }
 
@@ -44,7 +58,10 @@ export class OrderController {
 
   @Get('user/:userId')
   @ApiOperation({ summary: 'Get orders by user ID' })
-  @ApiResponse({ status: 200, description: 'User orders retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'User orders retrieved successfully',
+  })
   async getOrdersByUserId(@Param('userId') userId: string) {
     // TODO: Implement get orders by user ID
   }

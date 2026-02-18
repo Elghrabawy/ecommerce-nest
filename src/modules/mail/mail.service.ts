@@ -12,4 +12,16 @@ export class MailService {
       html: body,
     });
   }
+
+  async sendWelcomeEmail(to: string, name: string) {
+    await this.mailer.sendMail({
+      to,
+      subject: 'Welcome to Our Platform! 🎉',
+      template: 'welcome', // This refers to welcome.ejs
+      context: {
+        name: name,
+        email: to,
+      },
+    });
+  }
 }

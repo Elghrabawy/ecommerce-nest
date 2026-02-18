@@ -13,6 +13,13 @@
           "skipAutoHttpCode": true
         }
       }
+    ],
+    "assets": [
+      {
+        "include": "./modules/mail/templates",
+        "outDir": "dist/",
+        "watchAssets": true
+      }
     ]
   }
 }
