@@ -23,7 +23,13 @@ async function bootstrap() {
     .build();
 
   // use global validation pipe
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // to extract only the properties that are defined in the DTOs
+      forbidNonWhitelisted: false, // disable throwing error if there are extra properties that are not defined in the DTOs
+      transform: true, // to automatically transform payloads to be objects typed according to their DTO classes
+    }),
+  );
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
