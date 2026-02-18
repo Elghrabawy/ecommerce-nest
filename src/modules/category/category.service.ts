@@ -55,7 +55,7 @@ export class CategoryService {
     return category;
   }
 
-  async createCategory(categoryData: CreateCategoryDto) {
+  async createCategory(categoryData: CreateCategoryDto): Promise<Category> {
     categoryData.slug = this.generateSlug(categoryData.name);
 
     const existingCategory = await this.categoryRepo.findOneBy({
@@ -115,7 +115,7 @@ export class CategoryService {
     // TODO: Implement get products by category with filters
   }
 
-  async getChildCategories(categoryId: number) {
+  async getChildCategories(categoryId: number): Promise<Category[]> {
     const category = await this.categoryRepo.findOne({
       where: { id: categoryId },
       relations: ['children'],
@@ -128,7 +128,10 @@ export class CategoryService {
     return category.children;
   }
 
-  async moveCategory(categoryId: number, newParentId?: number) {
+  async moveCategory(
+    categoryId: number,
+    newParentId?: number,
+  ): Promise<Category> {
     const category = await this.categoryRepo.findOne({
       where: { id: categoryId },
       relations: ['parent'],
@@ -144,6 +147,8 @@ export class CategoryService {
         throw new NotFoundException('New parent category not found');
       }
       category.parent = newParent;
+
+      return await this.categoryRepo.save(category);
     } else {
       throw new BadRequestException(
         'Moving category to root is not supported yet',
@@ -160,7 +165,7 @@ export class CategoryService {
       .replace(/-+/g, '-');
   }
 
-  async getTopLevelCategories() {
+  async getTopLevelCategories(): Promise<Category[]> {
     return await this.categoryRepo.find({
       where: { parent: false },
     });

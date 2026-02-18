@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AddressService } from './address.service';
@@ -18,9 +19,11 @@ import { User } from '../user/entities/user.entity';
 import AuthAddress from './decorators/auth-address.decorator';
 import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/utils/enums';
+import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
 
 @ApiTags('addresses')
 @Controller('addresses')
+@UseInterceptors(ResponseInterceptor<Address>)
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 

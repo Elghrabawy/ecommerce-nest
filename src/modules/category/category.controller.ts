@@ -11,14 +11,17 @@ import {
   Body,
   Query,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { Category } from './entities/category.entity';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
+import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
 
 @ApiTags('categories')
 @Controller('categories')
+@UseInterceptors(ResponseInterceptor<Category>)
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
@@ -40,7 +43,7 @@ export class CategoryController {
     status: 200,
     description: 'Category tree retrieved successfully',
   })
-  async getCategoryTree(): Promise<any> {
+  async getCategoryTree(): Promise<Category[]> {
     return await this.categoryService.getCategoryTree();
   }
 
@@ -50,7 +53,7 @@ export class CategoryController {
     status: 200,
     description: 'Top-level categories retrieved successfully',
   })
-  async getTopLevelCategories() {
+  async getTopLevelCategories(): Promise<Category[]> {
     return await this.categoryService.getTopLevelCategories();
   }
 
@@ -66,7 +69,7 @@ export class CategoryController {
   @Get('slug/:slug')
   @ApiOperation({ summary: 'Get category by slug' })
   @ApiResponse({ status: 200, description: 'Category retrieved successfully' })
-  async getCategoryBySlug(@Param('slug') slug: string) {
+  async getCategoryBySlug(@Param('slug') slug: string): Promise<Category> {
     return await this.categoryService.getCategoryBySlug(slug);
   }
 
@@ -74,7 +77,9 @@ export class CategoryController {
   @ApiOperation({ summary: 'Create new category' })
   @ApiResponse({ status: 201, description: 'Category created successfully' })
   @ApiBody({ type: CreateCategoryDto })
-  async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
+  async createCategory(
+    @Body() createCategoryDto: CreateCategoryDto,
+  ): Promise<Category> {
     return await this.categoryService.createCategory(createCategoryDto);
   }
 
@@ -84,7 +89,7 @@ export class CategoryController {
   async updateCategory(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCategoryDto: UpdateCategoryDto,
-  ) {
+  ): Promise<Category> {
     return await this.categoryService.updateCategory(
       Number(id),
       updateCategoryDto,
@@ -98,26 +103,15 @@ export class CategoryController {
     return await this.categoryService.deleteCategory(Number(id));
   }
 
-  @Get(':id/products')
-  @ApiOperation({ summary: 'Get products by category' })
-  @ApiResponse({
-    status: 200,
-    description: 'Category products retrieved successfully',
-  })
-  async getCategoryProducts(
-    @Param('id', ParseIntPipe) id: number,
-    @Query() query: any,
-  ) {
-    // TODO: Implement get products by category with filters
-  }
-
   @Get(':id/children')
   @ApiOperation({ summary: 'Get child categories' })
   @ApiResponse({
     status: 200,
     description: 'Child categories retrieved successfully',
   })
-  async getChildCategories(@Param('id', ParseIntPipe) id: number) {
+  async getChildCategories(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Category[]> {
     return await this.categoryService.getChildCategories(Number(id));
   }
 
@@ -127,7 +121,7 @@ export class CategoryController {
   async moveCategory(
     @Param('id', ParseIntPipe) id: number,
     @Body('new_parent_id', ParseIntPipe) newParentId: number,
-  ) {
+  ): Promise<Category> {
     return await this.categoryService.moveCategory(id, newParentId);
   }
 }

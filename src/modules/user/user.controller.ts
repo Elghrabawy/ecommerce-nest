@@ -21,8 +21,10 @@ import { User } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileUploadDto } from 'src/modules/storage/dto/file-upload.dto';
+import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
 
 @Controller('users')
+@UseInterceptors(ResponseInterceptor<User>)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -51,7 +53,6 @@ export class UserController {
   async fetchProfile(@CurrentUser() user: User): Promise<User> {
     return await this.userService.findById(user.id);
   }
-
 
   @Delete()
   @AuthRoles(UserRole.ADMIN)
