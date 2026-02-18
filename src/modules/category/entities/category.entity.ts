@@ -10,6 +10,7 @@ import {
   TreeParent,
 } from 'typeorm';
 import { Product } from 'src/modules/product/entities/product.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('categories')
 @Tree('materialized-path')
@@ -27,15 +28,18 @@ export class Category extends BaseEntity {
   @Column({ nullable: true })
   image?: string;
 
+  @Exclude()
   @Column({ default: true })
   isActive: boolean;
 
+  @Exclude()
   @Column('int', { default: 0 })
   sortOrder: number;
 
   @TreeChildren()
   children: Category[];
 
+  @Exclude()
   @TreeParent()
   parent: Category;
 

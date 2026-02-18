@@ -1,4 +1,6 @@
+import { ParseIntPipe } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsOptional, Min, Max, IsInt } from 'class-validator';
 
 export class PaginationDto {
@@ -7,6 +9,7 @@ export class PaginationDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @Min(1)
   page?: number = 1;
 
@@ -15,6 +18,7 @@ export class PaginationDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @Min(1)
   @Max(100, { message: 'limit cannot exceed 100' })
   limit?: number = 20;

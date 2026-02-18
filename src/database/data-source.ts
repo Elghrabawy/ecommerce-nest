@@ -13,7 +13,7 @@ export function createDatabaseConfig() {
     database: process.env.DB_NAME,
     entities: ['src/**/*.entity{.ts,.js}'],
     synchronize: false, // NEVER true in production!
-    logging: process.env.NODE_ENV === 'development',
+    logging: true, //process.env.NODE_ENV === 'development',
     migrations: ['src/database/migrations/*{.ts,.js}'],
     migrationsTableName: 'migrations',
     migrationsRun: false,

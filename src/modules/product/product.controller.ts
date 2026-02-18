@@ -8,109 +8,113 @@ import {
   Body,
   Query,
   NotImplementedException,
+  ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto } from './dto';
-import type { ProductFilters } from './types/product-filter.interface';
-
+import { ProductFilterDto } from './dto/product-filter.dto';
+import { PaginationDto } from 'src/common/dto';
+import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
 @ApiTags('products')
 @Controller('products')
+@UseInterceptors(ResponseInterceptor<Product>)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all products' })
-  @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
-  async getProducts(@Query() filters: ProductFilters): Promise<Product[]> {
-    throw new NotImplementedException();
+  async getProducts(
+    @Query() pagination?: PaginationDto,
+    @Query() filters?: ProductFilterDto,
+  ): Promise<Product[]> {
+    console.log('Received pagination:', pagination);
+    console.log('Received filters:', filters);
+
+    return (await this.productService.getAllProducts(
+      pagination,
+      filters,
+    )) as Product[];
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
-  @ApiResponse({ status: 200, description: 'Product retrieved successfully' })
-  async getProductById(@Param('id') id: string): Promise<Product> {
-    throw new NotImplementedException();
+  async getProductById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Product> {
+    return await this.productService.getProductById(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create new product' })
-  @ApiResponse({ status: 201, description: 'Product created successfully' })
   async createProduct(
     @Body() createProductDto: CreateProductDto,
   ): Promise<Product> {
-    throw new NotImplementedException();
+    return await this.productService.createProduct(createProductDto);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update product' })
-  @ApiResponse({ status: 200, description: 'Product updated successfully' })
   async updateProduct(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    throw new NotImplementedException();
+    return await this.productService.updateProduct(id, updateProductDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete product' })
-  @ApiResponse({ status: 200, description: 'Product deleted successfully' })
-  async deleteProduct(@Param('id') id: string): Promise<{ message: string }> {
-    throw new NotImplementedException();
+  async deleteProduct(@Param('id', ParseIntPipe) id: number) {
+    await this.productService.deleteProduct(id);
   }
 
   @Get('search/:term')
   @ApiOperation({ summary: 'Search products' })
-  @ApiResponse({
-    status: 200,
-    description: 'Products search results retrieved successfully',
-  })
   async searchProducts(@Param('term') searchTerm: string): Promise<Product[]> {
-    throw new NotImplementedException();
-  }
-
-
-  @Get('featured')
-  @ApiOperation({ summary: 'Get featured products' })
-  @ApiResponse({
-    status: 200,
-    description: 'Featured products retrieved successfully',
-  })
-  async getFeaturedProducts(): Promise<Product[]> {
     throw new NotImplementedException();
   }
 
   @Get(':id/related')
   @ApiOperation({ summary: 'Get related products' })
-  @ApiResponse({
-    status: 200,
-    description: 'Related products retrieved successfully',
-  })
-  async getRelatedProducts(@Param('id') id: string): Promise<Product[]> {
-    throw new NotImplementedException();
+  async getRelatedProducts(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Product[]> {
+    return await this.productService.getRelatedProducts(id);
   }
 
   @Put(':id/stock')
   @ApiOperation({ summary: 'Update product stock' })
-  @ApiResponse({
-    status: 200,
-    description: 'Product stock updated successfully',
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        quantity: { type: 'number', example: 100 },
+      },
+    },
   })
   async updateProductStock(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body('quantity') quantity: number,
   ): Promise<Product> {
-    throw new NotImplementedException();
+    return await this.productService.updateProductStock(Number(id), quantity);
   }
 
   @Get('category/:categoryId')
   @ApiOperation({ summary: 'Get products by category' })
-  @ApiResponse({
-    status: 200,
-    description: 'Category products retrieved successfully',
-  })
-  async getProductsByCategory(@Param('categoryId') categoryId: string) {
-    throw new NotImplementedException();
+  async getProductsByCategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ): Promise<Product[]> {
+    const products =
+      await this.productService.getProductsByCategory(categoryId);
+
+    return products;
   }
 }

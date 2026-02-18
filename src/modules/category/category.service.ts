@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
-import type { ProductFilters } from '../product/types/product-filter.interface';
+import type { ProductFilterDto } from '../product/dto/product-filter.dto';
 
 @Injectable()
 export class CategoryService {
@@ -111,7 +111,7 @@ export class CategoryService {
     return { message: 'Category deleted successfully' };
   }
 
-  async getCategoryProducts(categoryId: number, filters?: ProductFilters) {
+  async getCategoryProducts(categoryId: number, filters?: ProductFilterDto) {
     // TODO: Implement get products by category with filters
   }
 

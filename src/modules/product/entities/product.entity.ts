@@ -2,7 +2,14 @@ import { OrderItem } from 'src/modules/order/entities/order-item.entity';
 import { Review } from 'src/modules/reviews/entities/review.entity';
 import { Category } from 'src/modules/category/entities/category.entity';
 import { BaseEntity } from 'src/common/entities';
-import { Entity, Column, Index, VersionColumn, OneToMany, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  Index,
+  VersionColumn,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 @Entity('products')
 export class Product extends BaseEntity {
   @Column()
@@ -24,7 +31,9 @@ export class Product extends BaseEntity {
   @Column('jsonb', { nullable: true })
   images: string[];
 
-  @ManyToOne(() => Category, (category) => category.products, { nullable: true })
+  @ManyToOne(() => Category, (category) => category.products, {
+    nullable: true,
+  })
   category: Category;
 
   // Optimistic Locking: Increment automatically on save

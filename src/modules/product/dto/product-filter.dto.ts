@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsOptional, MaxLength, Min } from 'class-validator';
 
 export class ProductFilterDto {
@@ -10,23 +11,28 @@ export class ProductFilterDto {
   @MaxLength(20, { message: 'Name must be at most 20 characters long' })
   @IsOptional()
   name?: string;
-
+  
   @ApiProperty({
     description: 'ID of the category to filter by',
   })
+  @IsOptional()
+  @Type(() => Number)
   categoryId?: number;
+
   @ApiProperty({
     description: 'Minimum price to filter by',
   })
-  @Min(0, { message: 'Minimum price must be a positive number' })
   @IsOptional()
+  @Type(() => Number)
+  @Min(0, { message: 'Minimum price must be a positive number' })
   minPrice?: number;
 
   @ApiProperty({
     description: 'Maximum price to filter by',
   })
-  @Min(0, { message: 'Maximum price must be a positive number' })
   @IsOptional()
+  @Type(() => Number)
+  @Min(0, { message: 'Maximum price must be a positive number' })
   maxPrice?: number;
 
   @ApiProperty({
