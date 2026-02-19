@@ -1,44 +1,79 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  UseInterceptors,
+  ParseIntPipe,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CartService } from './cart.service';
+import { CurrentUser } from '../user/decorators/current-user.decorator';
+import { User } from '../user/entities/user.entity';
+import Auth from '../auth/decorators/auth.decorator';
+import AddToCartDto from './dto/add-to-cart.dto';
+import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
 
 @ApiTags('cart')
 @Controller('cart')
+@Auth()
+@UseInterceptors(ResponseInterceptor<any>)
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all cart items' })
-  @ApiResponse({ status: 200, description: 'Cart items retrieved successfully' })
-  async getCartItems() {
-    // TODO: Implement get cart items
+  async getCartItems(@CurrentUser() user: User) {
+    return this.cartService.getCartItems(user.id);
   }
 
   @Post('add')
   @ApiOperation({ summary: 'Add item to cart' })
-  @ApiResponse({ status: 201, description: 'Item added to cart successfully' })
-  async addToCart(@Body() addToCartDto: any) {
-    // TODO: Implement add to cart
+  async addToCart(
+    @Body() addToCartDto: AddToCartDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.cartService.addToCart(
+      user.id,
+      addToCartDto.productId,
+      addToCartDto.quantity,
+    );
   }
 
-  @Put(':id')
+  @Put('/update')
   @ApiOperation({ summary: 'Update cart item quantity' })
-  @ApiResponse({ status: 200, description: 'Cart item updated successfully' })
-  async updateCartItem(@Param('id') id: string, @Body() updateCartDto: any) {
-    // TODO: Implement update cart item
+  async updateCartItem(
+    @Body() updateDto: AddToCartDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.cartService.updateCartItem(
+      user.id,
+      updateDto.productId,
+      updateDto.quantity,
+    );
   }
 
-  @Delete(':id')
+  @Delete(':productId')
   @ApiOperation({ summary: 'Remove item from cart' })
-  @ApiResponse({ status: 200, description: 'Item removed from cart successfully' })
-  async removeFromCart(@Param('id') id: string) {
-    // TODO: Implement remove from cart
+  async removeFromCart(
+    @Param('productId', ParseIntPipe) productId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.cartService.removeFromCart(user.id, productId);
   }
 
   @Delete()
   @ApiOperation({ summary: 'Clear cart' })
-  @ApiResponse({ status: 200, description: 'Cart cleared successfully' })
-  async clearCart() {
-    // TODO: Implement clear cart
+  async clearCart(@CurrentUser() user: User) {
+    return this.cartService.clearCart(user.id);
+  }
+
+  @Get('total')
+  @ApiOperation({ summary: 'Get cart total price' })
+  async getCartTotal(@CurrentUser() user: User) {
+    return this.cartService.getCartTotal(user.id);
   }
 }
