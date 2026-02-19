@@ -13,6 +13,7 @@ export abstract class BaseEntity {
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   created_at: Date;
 
+  @Exclude()
   @CreateDateColumn({
     type: 'timestamp',
     default: () => CURRENT_TIMESTAMP,
