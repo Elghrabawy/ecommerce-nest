@@ -12,10 +12,12 @@ export enum StorageProvider {
 
 export enum OrderStatus {
   PENDING = 'PENDING',
+  AWAITING_PAYMENT = 'AWAITING_PAYMENT',
   PAID = 'PAID',
+  PROCESSING = 'PROCESSING',
   SHIPPED = 'SHIPPED',
-  DELIVERED = 'DELIVERED',
-  CANCELLED = 'CANCELLED',
+  FAILED = 'FAILED', // E.g., Inventory allocation failed
+  CANCELLED = 'CANCELLED'
 }
 
 export enum PaymentStatus {
@@ -28,18 +30,11 @@ export enum PaymentStatus {
 }
 
 export enum PaymentMethod {
-  CREDIT_CARD = 'CREDIT_CARD',
-  DEBIT_CARD = 'DEBIT_CARD',
   PAYPAL = 'PAYPAL',
   STRIPE = 'STRIPE',
-  BANK_TRANSFER = 'BANK_TRANSFER',
-  CASH = 'CASH',
 }
 
 export enum PaymentProvider {
   STRIPE = 'STRIPE',
   PAYPAL = 'PAYPAL',
-  SQUARE = 'SQUARE',
-  RAZORPAY = 'RAZORPAY',
-  MANUAL = 'MANUAL',
 }
