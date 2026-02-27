@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Address } from './entities/address.entity';
@@ -132,6 +137,25 @@ export class AddressService {
     });
 
     return address;
+  }
+
+  async isAuthorizedAddress(
+    userId: number,
+    addressId: number,
+  ): Promise<boolean> {
+    const address = await this.addressRepository.findOne({
+      where: { id: addressId },
+    });
+
+    if (!address) {
+      throw new NotFoundException('Address not found');
+    }
+
+    if (address.userId !== userId) {
+      return false;
+    }
+
+    return true;
   }
 
   // async getAddressStatistics(userId: number): Promise<any> {

@@ -24,7 +24,7 @@ export class Order extends BaseEntity {
   items: OrderItem[];
 
   @OneToOne(() => Payment, (payment) => payment.order, { cascade: true })
-  payment: Payment;
+  payment?: Payment;
 
   @ManyToOne(() => Address, { nullable: true })
   shippingAddress: Address;

@@ -16,8 +16,8 @@ export enum OrderStatus {
   PAID = 'PAID',
   PROCESSING = 'PROCESSING',
   SHIPPED = 'SHIPPED',
-  FAILED = 'FAILED', // E.g., Inventory allocation failed
-  CANCELLED = 'CANCELLED'
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
 }
 
 export enum PaymentStatus {

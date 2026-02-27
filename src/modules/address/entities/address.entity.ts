@@ -8,6 +8,9 @@ export class Address extends BaseEntity {
   user: User;
 
   @Column()
+  userId: number;
+
+  @Column()
   Title: string;
 
   @Column()
