@@ -24,4 +24,40 @@ export class MailService {
       },
     });
   }
+
+  async sendPaymentSuccessEmail(to: string, orderId: number, amount: number) {
+    await this.mailer.sendMail({
+      to,
+      subject: `Payment Confirmed for Order #${orderId} ✓`,
+      template: 'payment-success',
+      context: {
+        orderId,
+        amount: amount.toFixed(2),
+      },
+    });
+  }
+
+  async sendRefundEmail(to: string, orderId: number, amount: number) {
+    await this.mailer.sendMail({
+      to,
+      subject: `Refund Processed for Order #${orderId}`,
+      template: 'payment-refund',
+      context: {
+        orderId,
+        amount: amount.toFixed(2),
+      },
+    });
+  }
+
+  async sendPaymentFailedEmail(to: string, orderId: number, reason: string) {
+    await this.mailer.sendMail({
+      to,
+      subject: `Payment Failed for Order #${orderId}`,
+      template: 'payment-failed',
+      context: {
+        orderId,
+        reason,
+      },
+    });
+  }
 }
