@@ -36,6 +36,7 @@
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/schedule": "^6.1.1",
     "@nestjs/swagger": "^11.2.5",
     "@nestjs/typeorm": "^11.0.0",
     "bcrypt": "^6.0.0",
@@ -49,6 +50,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "streamifier": "^0.1.1",
+    "stripe": "^20.4.0",
     "typeorm": "^0.3.28",
     "typeorm-extension": "^3.8.0"
   },
