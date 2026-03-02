@@ -1,9 +1,11 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository, DataSource, In } from 'typeorm';
+import { Cron } from '@nestjs/schedule';
+import { Repository, DataSource, In, LessThan } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from '../user/user.service';
@@ -14,16 +16,32 @@ import { Product } from '../product/entities/product.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { OrderStatus } from 'src/common/utils/enums';
 import { Address } from '../address/entities/address.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OrderService {
+  private readonly logger = new Logger(OrderService.name);
+  private readonly orderExpirationTimeInMinutes: number;
+
+  private static readonly CANCELLABLE_STATUSES: OrderStatus[] = [
+    OrderStatus.PENDING,
+    OrderStatus.AWAITING_PAYMENT,
+    OrderStatus.FAILED,
+  ];
+
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
     private readonly userService: UserService,
     private readonly addressService: AddressService,
     private readonly dataSource: DataSource,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.orderExpirationTimeInMinutes = this.configService.get<number>(
+      'ORDER_EXPIRATION_TIME_MINUTES',
+      30,
+    );
+  }
 
   async getAllOrders(): Promise<Order[]> {
     const order = await this.orderRepository.find({
@@ -131,16 +149,16 @@ export class OrderService {
           priceAtPurchase: product.price,
         } as OrderItem);
 
-        product.stock -= item.quantity
-        
+        product.stock -= item.quantity;
+
         totalAmount += product.price * item.quantity;
       }
-      await queryRunner.manager.save(Product, products)
+      await queryRunner.manager.save(Product, products);
 
       const order = queryRunner.manager.create(Order, {
         user,
         totalAmount,
-        status: OrderStatus.PENDING,
+        status: OrderStatus.AWAITING_PAYMENT,
         items: orderItems,
         shippingAddress: { id: orderData.shippingAddressId } as Address,
         billingAddress: { id: orderData.billingAddressId } as Address,
@@ -182,27 +200,26 @@ export class OrderService {
         throw new NotFoundException(`Order with ID ${orderId} not found`);
       }
 
-      if (order.status === OrderStatus.CANCELLED) {
+      if (!OrderService.CANCELLABLE_STATUSES.includes(order.status)) {
         throw new BadRequestException(
-          `Order with ID ${orderId} is already canceled`,
+          `Order with ID ${orderId} cannot be cancelled. Current status: ${order.status}. Only orders with status ${OrderService.CANCELLABLE_STATUSES.join(', ')} can be cancelled.`,
         );
       }
-
-      // TODO: check if the order not shipped
 
       order.status = OrderStatus.CANCELLED;
 
       for (const item of order.items) {
         const result = await manager.increment(
-          Product, 
-          { id: item.product.id }, 
-          'stock', 
-          item.quantity
+          Product,
+          { id: item.product.id },
+          'stock',
+          item.quantity,
         );
-        
-        
-        if(result.affected === 0) {
-          throw new BadRequestException(`Product With ID ${item.product.id} not found`)
+
+        if (result.affected === 0) {
+          throw new BadRequestException(
+            `Product With ID ${item.product.id} not found`,
+          );
         }
       }
 
@@ -259,5 +276,61 @@ export class OrderService {
     });
 
     return products;
+  }
+
+  @Cron('0 */1 * * * *')
+  async expireUnpaidOrders() {
+    const expirationTime = new Date();
+    expirationTime.setMinutes(
+      expirationTime.getMinutes() - this.orderExpirationTimeInMinutes,
+    );
+
+    this.logger.debug(
+      `Running expireUnpaidOrders job. Expiring orders created before ${expirationTime}`,
+    );
+
+    const expiredOrders = await this.orderRepository.find({
+      where: {
+        status: OrderStatus.AWAITING_PAYMENT,
+        created_at: LessThan(expirationTime),
+      },
+      relations: ['items', 'items.product', 'payment'],
+    });
+
+    if (expiredOrders.length === 0) return;
+
+    this.logger.log(
+      `Found ${expiredOrders.length} expired unpaid orders. Cleaning up...`,
+    );
+
+    for (const order of expiredOrders) {
+      // if (order.payment && order.payment.status === PaymentStatus.PENDING) {
+      //   this.logger.log(
+      //     `Order ${order.id} has a pending payment. Skipping expiration.`,
+      //   );
+      //   continue;
+      // }
+
+      try {
+        await this.dataSource.manager.transaction(async (manager) => {
+          for (const item of order.items) {
+            await manager.increment(
+              Product,
+              { id: item.product.id },
+              'stock',
+              item.quantity,
+            );
+          }
+
+          order.status = OrderStatus.EXPIRED;
+          await manager.save(order);
+          this.logger.log(`Order ${order.id} expired and stock restored.`);
+        });
+      } catch (error) {
+        this.logger.error(
+          `Failed to expire order ${order.id}: ${error.message}`,
+        );
+      }
+    }
   }
 }

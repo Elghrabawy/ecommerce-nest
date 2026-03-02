@@ -21,6 +21,7 @@ import minioConfig from './config/minio.config';
 import jwtConfig from './config/jwt.config';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     MailModule,
     AddressModule,
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

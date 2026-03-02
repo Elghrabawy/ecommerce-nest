@@ -17,6 +17,7 @@ import Auth from '../auth/decorators/auth.decorator';
 import AuthRoles from '../auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/utils/enums';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -39,7 +40,6 @@ export class OrderController {
   })
   @Auth()
   async getOrdersByUserId(@CurrentUser() user: User): Promise<Order[]> {
-    console.log('Current user:', user);
     return this.orderService.getOrdersByUserId(user.id);
   }
 
@@ -68,17 +68,19 @@ export class OrderController {
     status: 200,
     description: 'Order status updated successfully',
   })
+  @AuthRoles(UserRole.ADMIN)
   async updateOrderStatus(
-    @Param('id') id: string,
-    @Body() updateStatusDto: any,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateStatusDto: UpdateOrderStatusDto,
   ) {
-    // TODO: Implement update order status
+    return this.orderService.updateOrderStatus(id, updateStatusDto.status);
   }
 
-  @Delete(':id')
+  @Delete(':id/cancel')
   @ApiOperation({ summary: 'Cancel order' })
   @ApiResponse({ status: 200, description: 'Order cancelled successfully' })
-  async cancelOrder(@Param('id') id: string) {
-    // TODO: Implement cancel order
+  @Auth()
+  async cancelOrder(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.cancelOrder(id);
   }
 }
