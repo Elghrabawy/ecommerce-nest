@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Refunded</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: #ffffff;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .message {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333333;
+            margin-bottom: 30px;
+        }
+        .highlight {
+            color: #6c757d;
+            font-weight: 600;
+        }
+        .refund-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .refund-details h3 {
+            color: #333333;
+            margin-top: 0;
+            font-size: 20px;
+        }
+        .refund-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .refund-details td {
+            padding: 8px 0;
+            color: #555555;
+            font-size: 15px;
+        }
+        .refund-details td:first-child {
+            font-weight: 600;
+            color: #333333;
+        }
+        .refund-details td:last-child {
+            text-align: right;
+        }
+        .amount {
+            color: #28a745;
+            font-weight: 700;
+            font-size: 17px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: #ffffff;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>&#8617; Payment Refunded</h1>
+            <p>Your refund has been processed</p>
+        </div>
+
+        <div class="content">
+            <div class="message">
+                <p>Hi there,</p>
+                <p>We've processed a refund for your order <span class="highlight">#<%= orderId %></span>. The refunded amount will be returned to your original payment method.</p>
+            </div>
+
+            <div class="refund-details">
+                <h3>Refund Details</h3>
+                <table>
+                    <tr>
+                        <td>Order ID</td>
+                        <td>#<%= orderId %></td>
+                    </tr>
+                    <tr>
+                        <td>Refund Amount</td>
+                        <td><span class="amount">$<%= amount %></span></td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td><span class="highlight">Refunded</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <p style="color: #555555; font-size: 15px; line-height: 1.6;">
+                Please allow 5–10 business days for the refund to appear on your statement, depending on your bank or payment provider.
+            </p>
+
+            <div style="text-align: center;">
+                <a href="#" class="cta-button">View Order</a>
+            </div>
+
+            <div class="divider"></div>
+
+            <p style="color: #666666; font-size: 14px; line-height: 1.5;">
+                <strong>Need help?</strong> Contact our support team anytime.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

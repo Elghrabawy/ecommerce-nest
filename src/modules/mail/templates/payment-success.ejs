@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: #ffffff;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .message {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333333;
+            margin-bottom: 30px;
+        }
+        .highlight {
+            color: #28a745;
+            font-weight: 600;
+        }
+        .order-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .order-details h3 {
+            color: #333333;
+            margin-top: 0;
+            font-size: 20px;
+        }
+        .order-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .order-details td {
+            padding: 8px 0;
+            color: #555555;
+            font-size: 15px;
+        }
+        .order-details td:first-child {
+            font-weight: 600;
+            color: #333333;
+        }
+        .order-details td:last-child {
+            text-align: right;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: #ffffff;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>&#10003; Payment Successful</h1>
+            <p>Your order has been confirmed</p>
+        </div>
+
+        <div class="content">
+            <div class="message">
+                <p>Hi there,</p>
+                <p>Your payment for order <span class="highlight">#<%= orderId %></span> has been processed successfully.</p>
+            </div>
+
+            <div class="order-details">
+                <h3>Order Summary</h3>
+                <table>
+                    <tr>
+                        <td>Order ID</td>
+                        <td>#<%= orderId %></td>
+                    </tr>
+                    <tr>
+                        <td>Amount Paid</td>
+                        <td><span class="highlight">$<%= amount %></span></td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td><span class="highlight">Paid</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="#" class="cta-button">View Order</a>
+            </div>
+
+            <div class="divider"></div>
+
+            <p style="color: #666666; font-size: 14px; line-height: 1.5;">
+                <strong>Need help?</strong> Contact our support team anytime.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
