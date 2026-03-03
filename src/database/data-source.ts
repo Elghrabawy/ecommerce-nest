@@ -1,7 +1,6 @@
-import { config } from 'dotenv';
+import { Logger } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-
-config({ path: '.env.development' });
+import '../config/env.loader'; // Load environment variables
 
 export function createDatabaseConfig() {
   return {
@@ -9,7 +8,7 @@ export function createDatabaseConfig() {
     host: process.env.DB_HOST,
     port: +process.env.DB_PORT!,
     username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
+    password: String(process.env.DB_PASSWORD),
     database: process.env.DB_NAME,
     entities: ['src/**/*.entity{.ts,.js}'],
     synchronize: false, // NEVER true in production!
@@ -24,3 +23,8 @@ export function createDatabaseConfig() {
 
 // Export DataSource for CLI
 export default new DataSource(createDatabaseConfig());
+const logger = new Logger('DatabaseConfig');
+logger.debug(
+  'Database configuration loaded successfully',
+  createDatabaseConfig(),
+);

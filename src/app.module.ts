@@ -22,6 +22,7 @@ import jwtConfig from './config/jwt.config';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import envFile from './config/env.loader';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     CategoryModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.development`,
+      envFilePath: envFile,
       load: [dbConfig, minioConfig, jwtConfig, refreshJwtConfig],
     }),
 

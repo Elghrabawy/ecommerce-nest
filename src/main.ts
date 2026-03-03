@@ -8,7 +8,7 @@ async function bootstrap() {
     rawBody: true,
   });
 
-  const config = new DocumentBuilder()
+  const swaggerDocument = new DocumentBuilder()
     .setTitle('First NestJS API')
     .setVersion('1.0')
     .addBearerAuth(
@@ -33,7 +33,8 @@ async function bootstrap() {
     }),
   );
 
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  const documentFactory = () =>
+    SwaggerModule.createDocument(app, swaggerDocument);
   SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);

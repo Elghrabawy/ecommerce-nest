@@ -2,8 +2,9 @@ import { registerAs } from '@nestjs/config';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions.js';
 import { createDatabaseConfig } from '../database/data-source';
 import { Logger } from '@nestjs/common';
+import './env.loader';
 
-export default registerAs('database', (): PostgresConnectionOptions => {
+const config = registerAs('database', (): PostgresConnectionOptions => {
   const baseConfig = createDatabaseConfig();
 
   return {
@@ -15,8 +16,7 @@ export default registerAs('database', (): PostgresConnectionOptions => {
   } as PostgresConnectionOptions;
 });
 
+export default config;
+
 const logger = new Logger('DatabaseConfig');
-logger.log(
-  'Database configuration loaded successfully',
-  createDatabaseConfig(),
-);
+logger.debug('Database configuration loaded successfully', config);

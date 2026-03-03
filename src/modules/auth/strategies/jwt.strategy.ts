@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  Inject,
+  Logger,
+} from '@nestjs/common';
 import { type ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/common/interfaces';
@@ -6,11 +11,22 @@ import jwtConfig from 'src/config/jwt.config';
 
 @Injectable()
 export class JwtStrategy {
+  private readonly logger = new Logger(JwtStrategy.name);
   constructor(
     private readonly jwtService: JwtService,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
-  ) {}
+  ) {
+    if (!this.jwtConfiguration.secret) {
+      this.logger.error('JWT_SECRET is not configured');
+    }
+
+    if (!this.jwtConfiguration.expiresIn) {
+      this.logger.warn(
+        'JWT_EXPIRES_IN is not configured, using default of 1 hour',
+      );
+    }
+  }
 
   /**
    * Sign a token with the given payload using explicit secret

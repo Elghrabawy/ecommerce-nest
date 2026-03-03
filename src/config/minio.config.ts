@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
 import { registerAs } from '@nestjs/config';
 import { StorageProvider } from 'src/common/enums';
+import './env.loader';
 
 export interface MinioConfig {
   endPoint: string;
@@ -11,7 +13,7 @@ export interface MinioConfig {
   region: string;
 }
 
-export default registerAs(
+const config = registerAs(
   StorageProvider.MINIO,
   (): MinioConfig => ({
     endPoint: process.env.MINIO_ENDPOINT || 'localhost',
@@ -23,3 +25,8 @@ export default registerAs(
     region: process.env.MINIO_REGION || 'us-east-1',
   }),
 );
+
+export default config;
+
+const logger = new Logger('MinioConfig');
+logger.debug('Minio configuration loaded successfully', config);
