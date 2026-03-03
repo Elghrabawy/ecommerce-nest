@@ -38,6 +38,10 @@ export class PaymentService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
+  async getAllPayments(): Promise<Payment[]> {
+    return this.paymentRepository.find({ relations: ['order'] });
+  }
+
   async createPaymentIntent(
     userId: number,
     dto: CreatePaymentIntentDto,
@@ -139,8 +143,7 @@ export class PaymentService {
 
     return { clientSecret, paymentIntentId };
   }
-
-  // still need refactor this method 
+  // still need refactor this method
   async createPaymentSession(
     userId: number,
     dto: CreatePaymentSessionDto,
