@@ -1,6 +1,20 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Param,
+  Body,
+  Req,
+  type RawBodyRequest,
+  Headers,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
+import Auth from '../auth/decorators/auth.decorator';
+import { CurrentUser } from '../user/decorators/current-user.decorator';
+import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
+import { User } from '../user/entities/user.entity';
 
 @ApiTags('payments')
 @Controller('payments')
@@ -21,14 +35,21 @@ export class PaymentController {
     // TODO: Implement get payment by ID
   }
 
-  @Post('process')
-  @ApiOperation({ summary: 'Process payment' })
-  @ApiResponse({ status: 201, description: 'Payment processed successfully' })
-  async processPayment(@Body() processPaymentDto: any) {
-    // TODO: Implement process payment
+  @Post('create-intent')
+  @ApiOperation({ summary: 'Create a Stripe payment intent for an order' })
+  @ApiResponse({
+    status: 201,
+    description: 'Payment intent created successfully',
+  })
+  @Auth()
+  async createPaymentIntent(
+    @Body() dto: CreatePaymentIntentDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.paymentService.createPaymentIntent(user.id, dto);
   }
 
-  @Post('refund/:id')
+  @Post(':id/refund')
   @ApiOperation({ summary: 'Refund payment' })
   @ApiResponse({ status: 200, description: 'Payment refunded successfully' })
   async refundPayment(@Param('id') id: string, @Body() refundDto: any) {
@@ -37,15 +58,34 @@ export class PaymentController {
 
   @Get('order/:orderId')
   @ApiOperation({ summary: 'Get payments by order ID' })
-  @ApiResponse({ status: 200, description: 'Order payments retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Order payments retrieved successfully',
+  })
   async getPaymentsByOrderId(@Param('orderId') orderId: string) {
     // TODO: Implement get payments by order ID
   }
 
   @Put(':id/status')
   @ApiOperation({ summary: 'Update payment status' })
-  @ApiResponse({ status: 200, description: 'Payment status updated successfully' })
-  async updatePaymentStatus(@Param('id') id: string, @Body() updateStatusDto: any) {
+  @ApiResponse({
+    status: 200,
+    description: 'Payment status updated successfully',
+  })
+  async updatePaymentStatus(
+    @Param('id') id: string,
+    @Body() updateStatusDto: any,
+  ) {
     // TODO: Implement update payment status
+  }
+
+  @Post('webhook')
+  @ApiOperation({ summary: 'Handle Stripe webhook events' })
+  async handleWebhook(
+    @Req() req: RawBodyRequest<Request>,
+    @Headers('stripe-signature') signature: string,
+  ) {
+    await this.paymentService.handleWebhook(req.rawBody!, signature);
+    return { received: true };
   }
 }
