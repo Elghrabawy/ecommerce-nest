@@ -23,7 +23,7 @@ import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductFilterDto } from './dto/product-filter.dto';
 import { PaginationDto } from 'src/common/dto';
-import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from 'src/common/interceptors';
 @ApiTags('products')
 @Controller('products')
 @UseInterceptors(ResponseInterceptor<Product>)

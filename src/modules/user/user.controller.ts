@@ -21,7 +21,7 @@ import { User } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileUploadDto } from 'src/modules/storage/dto/file-upload.dto';
-import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from 'src/common/interceptors';
 
 @Controller('users')
 @UseInterceptors(ResponseInterceptor<User>)

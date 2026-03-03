@@ -4,7 +4,7 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { multiDataResponse, singleDataResponse } from '../utils/types';
+import { multiDataResponse, singleDataResponse } from '../interfaces';
 import { map, Observable } from 'rxjs';
 
 @Injectable()

@@ -19,7 +19,7 @@ import { User } from '../user/entities/user.entity';
 import AuthAddress from './decorators/auth-address.decorator';
 import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums';
-import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from 'src/common/interceptors';
 
 @ApiTags('addresses')
 @Controller('addresses')
