@@ -21,6 +21,7 @@ import {
   PaymentSuccessEvent,
   RefundedEvent,
 } from '../mail/events/mail.events';
+import { CreatePaymentSessionDto } from './dto/create-payment-session.dto';
 
 @Injectable()
 export class PaymentService {
@@ -137,6 +138,46 @@ export class PaymentService {
     }
 
     return { clientSecret, paymentIntentId };
+  }
+
+  // still need refactor this method 
+  async createPaymentSession(
+    userId: number,
+    dto: CreatePaymentSessionDto,
+  ): Promise<{ sessionUrl: string }> {
+    const { orderId, successUrl, cancelUrl, paymentMethod } = dto;
+
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId, user: { id: userId } },
+    });
+
+    if (!order) {
+      throw new NotFoundException(
+        `Order with ID ${orderId} not found for this user`,
+      );
+    }
+
+    if (order.status !== OrderStatus.AWAITING_PAYMENT) {
+      throw new BadRequestException(
+        `Order with ID ${orderId} is not awaiting payment. Current status: ${order.status}`,
+      );
+    }
+
+    const currency = this.configService.get<string>('stripe.currency', 'usd');
+
+    const session = await this.stripeProvider.createPaymentSession(
+      order.totalAmount,
+      currency,
+      successUrl,
+      cancelUrl,
+      {
+        orderId: order.id.toString(),
+        userId: userId.toString(),
+      },
+    );
+
+    const sessionUrl = session.url as string;
+    return { sessionUrl };
   }
 
   async handleWebhook(payload: Buffer, signature: string) {
