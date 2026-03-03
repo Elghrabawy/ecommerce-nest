@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../../../common/entities';
 import { Order } from '../../order/entities/order.entity';
 import {
@@ -9,7 +9,7 @@ import {
 
 @Entity('payments')
 export class Payment extends BaseEntity {
-  @OneToOne(() => Order, { nullable: false })
+  @ManyToOne(() => Order, (order) => order.payments, { nullable: false })
   @JoinColumn()
   order: Order;
 

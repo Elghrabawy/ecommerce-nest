@@ -294,7 +294,7 @@ export class OrderService {
         status: OrderStatus.AWAITING_PAYMENT,
         created_at: LessThan(expirationTime),
       },
-      relations: ['items', 'items.product', 'payment'],
+      relations: ['items', 'items.product', 'payments'],
     });
 
     if (expiredOrders.length === 0) return;
@@ -304,13 +304,6 @@ export class OrderService {
     );
 
     for (const order of expiredOrders) {
-      // if (order.payment && order.payment.status === PaymentStatus.PENDING) {
-      //   this.logger.log(
-      //     `Order ${order.id} has a pending payment. Skipping expiration.`,
-      //   );
-      //   continue;
-      // }
-
       try {
         await this.dataSource.manager.transaction(async (manager) => {
           for (const item of order.items) {
