@@ -5,14 +5,13 @@ import {
   NotImplementedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Not, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductFilterDto } from './dto/product-filter.dto';
 import { SelectQueryBuilder } from 'typeorm/browser';
 import { PaginationDto } from 'src/common/dto';
-import { generateSlug } from './../../common/utils/helpers';
-import { join } from 'path';
+import { generateSlug } from './../../common/utils';
 
 @Injectable()
 export class ProductService {
