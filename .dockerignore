@@ -1,0 +1,50 @@
+# Dependencies
+node_modules
+npm-debug.log
+
+# Build outputs
+dist
+build
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Tests
+coverage
+test
+
+# Documentation
+*.md
+docs
+
+# Uploads (if not needed in image)
+uploads
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yaml
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Misc
+*.log
