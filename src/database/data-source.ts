@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import '../config/env.loader'; // Load environment variables
 
@@ -12,7 +11,7 @@ export function createDatabaseConfig() {
     database: process.env.DB_NAME,
     entities: ['src/**/*.entity{.ts,.js}'],
     synchronize: false, // NEVER true in production!
-    logging: true, //process.env.NODE_ENV === 'development',
+    // logging: true, //process.env.NODE_ENV === 'development',
     migrations: ['src/database/migrations/*{.ts,.js}'],
     migrationsTableName: 'migrations',
     migrationsRun: false,
@@ -23,8 +22,3 @@ export function createDatabaseConfig() {
 
 // Export DataSource for CLI
 export default new DataSource(createDatabaseConfig());
-const logger = new Logger('DatabaseConfig');
-logger.debug(
-  'Database configuration loaded successfully',
-  createDatabaseConfig(),
-);
