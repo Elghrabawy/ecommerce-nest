@@ -21,7 +21,6 @@ import {
   PaymentSuccessEvent,
   RefundedEvent,
 } from '../mail/events/mail.events';
-import { CreatePaymentSessionDto } from './dto/create-payment-session.dto';
 
 @Injectable()
 export class PaymentService {
@@ -48,7 +47,7 @@ export class PaymentService {
   ): Promise<{ clientSecret: string; paymentIntentId: string }> {
     const order = await this.orderRepository.findOne({
       where: { id: dto.orderId, user: { id: userId } },
-      relations: ['payment'],
+      relations: ['payments'],
     });
 
     if (!order) {
@@ -63,44 +62,48 @@ export class PaymentService {
       );
     }
 
-    // Check for existing payment
-    if (order.payment) {
-      // If payment is already completed, don't allow creating a new intent
-      if (order.payment.status === PaymentStatus.COMPLETED) {
-        throw new BadRequestException(
-          `Order with ID ${dto.orderId} has already been paid`,
+    // Check for existing payments
+    const existingPayments: Payment[] =
+      (order.payments as Payment[] | undefined) || [];
+
+    // If any payment is already completed, don't allow creating a new intent
+    const completedPayment = existingPayments.find(
+      (p) => p.status === PaymentStatus.COMPLETED,
+    );
+    if (completedPayment) {
+      throw new BadRequestException(
+        `Order with ID ${dto.orderId} has already been paid`,
+      );
+    }
+
+    // If there's a pending payment intent, try to reuse it
+    const pendingPayment = existingPayments.find(
+      (p) => p.paymentIntentId && p.status === PaymentStatus.PENDING,
+    );
+
+    if (pendingPayment?.paymentIntentId) {
+      try {
+        const existingIntent = await this.stripeProvider.retrievePaymentIntent(
+          pendingPayment.paymentIntentId,
         );
-      }
 
-      // If there's a pending payment intent, try to reuse it
-      if (
-        order.payment.paymentIntentId &&
-        order.payment.status === PaymentStatus.PENDING
-      ) {
-        try {
-          const existingIntent =
-            await this.stripeProvider.retrievePaymentIntent(
-              order.payment.paymentIntentId,
-            );
-
-          // Reuse existing intent if it's still valid
-          if (
-            existingIntent.status !== 'canceled' &&
-            existingIntent.status !== 'succeeded'
-          ) {
-            this.logger.log(
-              `Reusing existing PaymentIntent ${existingIntent.id} for Order ${order.id}`,
-            );
-            return {
-              clientSecret: existingIntent.client_secret as string,
-              paymentIntentId: existingIntent.id,
-            };
-          }
-        } catch (error) {
-          this.logger.warn(
-            `Failed to retrieve existing PaymentIntent: ${error.message}. Creating new intent.`,
+        // Reuse existing intent if it's still valid
+        if (
+          existingIntent.status !== 'canceled' &&
+          existingIntent.status !== 'succeeded'
+        ) {
+          this.logger.log(
+            `Reusing existing PaymentIntent ${existingIntent.id} for Order ${order.id}`,
           );
+          return {
+            clientSecret: existingIntent.client_secret as string,
+            paymentIntentId: existingIntent.id,
+          };
         }
+      } catch (error) {
+        this.logger.warn(
+          `Failed to retrieve existing PaymentIntent: ${error instanceof Error ? error.message : 'Unknown error'}. Creating new intent.`,
+        );
       }
     }
 
@@ -116,14 +119,14 @@ export class PaymentService {
         },
       );
 
-    // Create or update payment record in db
-    if (order.payment) {
-      order.payment.paymentIntentId = paymentIntentId;
-      order.payment.status = PaymentStatus.PENDING;
-      order.payment.method = dto.paymentMethod;
-      await this.paymentRepository.save(order.payment);
+    // Update pending payment or create new payment record
+    if (pendingPayment) {
+      pendingPayment.paymentIntentId = paymentIntentId;
+      pendingPayment.status = PaymentStatus.PENDING;
+      pendingPayment.method = dto.paymentMethod;
+      await this.paymentRepository.save(pendingPayment);
       this.logger.log(
-        `Updated existing Payment ${order.payment.id} with new PaymentIntent ${paymentIntentId}`,
+        `Updated existing Payment ${pendingPayment.id} with new PaymentIntent ${paymentIntentId}`,
       );
     } else {
       const payment = this.paymentRepository.create({
