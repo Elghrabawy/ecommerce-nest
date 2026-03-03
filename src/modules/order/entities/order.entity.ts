@@ -1,6 +1,6 @@
 import { User } from 'src/modules/user/entities/user.entity';
 import { BaseEntity } from 'src/common/entities';
-import { OrderStatus } from 'src/common/utils/enums';
+import { OrderStatus } from 'src/common/enums';
 import { Entity, Column, ManyToOne, OneToMany, OneToOne, Index } from 'typeorm';
 import { OrderItem } from './order-item.entity';
 import { Payment } from 'src/modules/payment/entities/payment.entity';

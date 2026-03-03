@@ -15,7 +15,7 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { ProductModule } from './modules/product/product.module';
 import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { CategoryModule } from './modules/category/category.module';
-import { StorageProvider } from './common/utils/enums';
+import { StorageProvider } from './common/enums';
 import dbConfig from './config/db.config';
 import minioConfig from './config/minio.config';
 import jwtConfig from './config/jwt.config';

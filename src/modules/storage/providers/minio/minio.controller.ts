@@ -11,7 +11,7 @@ import {
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
-import { UserRole } from 'src/common/utils/enums';
+import { UserRole } from 'src/common/enums';
 import { FileUploadDto } from 'src/modules/storage/dto/file-upload.dto';
 import { FilesUploadDto } from 'src/modules/storage/dto/files-upload.dto';
 import { MinioStorageService } from './minio.service';

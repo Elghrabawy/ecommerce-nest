@@ -16,7 +16,7 @@ import Auth from 'src/modules/auth/decorators/auth.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
 import type { JwtPayload } from 'src/common/utils/types';
 import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
-import { UserRole } from 'src/common/utils/enums';
+import { UserRole } from 'src/common/enums';
 import { User } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';

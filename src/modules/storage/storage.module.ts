@@ -4,7 +4,7 @@ import { LocalStorageModule } from './providers/local/local.module';
 import { StorageService } from './storage.service';
 import { CloudinaryService } from './providers/cloudinary/cloudinary.service';
 import { MinioStorageService } from './providers/minio/minio.service';
-import { StorageProvider } from 'src/common/utils/enums';
+import { StorageProvider } from 'src/common/enums';
 import { CloudinaryModule } from './providers/cloudinary/cloudinary.module';
 import { MinioStorageModule } from './providers/minio/minio.module';
 

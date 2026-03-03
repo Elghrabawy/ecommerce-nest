@@ -5,7 +5,7 @@ import {
   PaymentStatus,
   PaymentMethod,
   PaymentProvider,
-} from '../../../common/utils/enums';
+} from '../../../common/enums';
 
 @Entity('payments')
 export class Payment extends BaseEntity {

@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import { StorageProvider } from 'src/common/utils/enums';
+import { StorageProvider } from 'src/common/enums';
 
 export interface MinioConfig {
   endPoint: string;
