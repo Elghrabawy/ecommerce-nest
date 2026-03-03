@@ -1,7 +1,6 @@
-import { ParseIntPipe } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, Min, Max, IsInt } from 'class-validator';
+import { IsOptional, Min, Max } from 'class-validator';
 
 export class PaginationDto {
   @ApiProperty({

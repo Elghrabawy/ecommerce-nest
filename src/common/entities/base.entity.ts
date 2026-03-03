@@ -3,7 +3,7 @@ import {
   DeleteDateColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { CURRENT_TIMESTAMP } from '../utils/constants';
+import { CURRENT_TIMESTAMP } from '../constants';
 import { Exclude } from 'class-transformer';
 
 export abstract class BaseEntity {
