@@ -2,6 +2,7 @@ import {
   HttpException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterUserDto } from 'src/modules/user/dtos/register-user.dto';
@@ -17,6 +18,8 @@ import { UserCreatedEvent } from '../mail/events/mail.events';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly userService: UserService,
     private readonly jwtStrategy: JwtStrategy,
@@ -26,21 +29,16 @@ export class AuthService {
 
   async registerUser(registerUserDto: RegisterUserDto): Promise<JwtResponse> {
     try {
-      console.log('Starting user registration...');
       const user: User = await this.userService.create(registerUserDto);
-      console.log('User created successfully:', user.id);
 
       // Emit user.created event after successful registration
-      const x = this.eventEmitter.emit(
+      this.eventEmitter.emit(
         'user.created',
         new UserCreatedEvent(user.email, user.name),
       );
-      console.log('User created event emitted:', x);
 
       // Generate tokens using separate strategies
       const payload = this.jwtStrategy.createPayload(user);
-      console.log('JWT payload created');
-
       const [accessToken, refreshToken] = await Promise.all([
         this.jwtStrategy.signToken(payload),
         this.refreshStrategy.createRefreshToken({
@@ -48,7 +46,8 @@ export class AuthService {
           email: user.email,
         }),
       ]);
-      console.log('Tokens generated successfully');
+
+      this.logger.log(`User registered successfully: ${user.email}`);
 
       return {
         status: 'success',
@@ -57,7 +56,10 @@ export class AuthService {
         refreshToken,
       };
     } catch (error) {
-      console.error('Registration error:', error);
+      this.logger.error(
+        `Registration failed for ${registerUserDto.email}: ${error.message}`,
+        error.stack,
+      );
       // If it's already an HTTP exception (like BadRequestException), rethrow it
       if (error instanceof HttpException) {
         throw error;
@@ -71,17 +73,13 @@ export class AuthService {
 
   async loginUser(loginDto: LoginDto): Promise<JwtResponse> {
     try {
-      console.log('Starting user login for:', loginDto.email);
       const user: User = await this.userService.validateUser(
         loginDto.email,
         loginDto.password,
       );
-      console.log('User validated successfully:', user.id);
 
       // Generate tokens using separate strategies
       const payload = this.jwtStrategy.createPayload(user);
-      console.log('JWT payload created for login');
-
       const [accessToken, refreshToken] = await Promise.all([
         this.jwtStrategy.signToken(payload),
         this.refreshStrategy.createRefreshToken({
@@ -89,7 +87,8 @@ export class AuthService {
           email: user.email,
         }),
       ]);
-      console.log('Login tokens generated successfully');
+
+      this.logger.log(`User logged in successfully: ${loginDto.email}`);
 
       return {
         status: 'success',
@@ -98,7 +97,7 @@ export class AuthService {
         refreshToken,
       };
     } catch (error) {
-      console.error('Login error:', error);
+      this.logger.warn(`Login failed for ${loginDto.email}: ${error.message}`);
       if (error instanceof HttpException) {
         throw error;
       }
@@ -115,6 +114,7 @@ export class AuthService {
         data: payload,
       };
     } catch (error) {
+      this.logger.warn('Token verification failed');
       if (error instanceof HttpException) {
         throw error;
       }
@@ -143,6 +143,8 @@ export class AuthService {
         this.refreshStrategy.createRefreshToken(user),
       ]);
 
+      this.logger.log(`Token refreshed for user: ${user.email}`);
+
       return {
         status: 'success',
         accessToken,
@@ -150,6 +152,7 @@ export class AuthService {
         expiresIn: '1h', // or get from config
       };
     } catch (error) {
+      this.logger.warn('Token refresh failed');
       if (error instanceof HttpException) {
         throw error;
       }
