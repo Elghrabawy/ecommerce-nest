@@ -8,7 +8,6 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
-  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -18,10 +17,8 @@ import type { JwtPayload } from 'src/common/interfaces';
 import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums';
 import { User } from './entities/user.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
-import { FileUploadDto } from 'src/modules/storage/dto/file-upload.dto';
 import { ResponseInterceptor } from 'src/common/interceptors';
+import { ImageUpload } from 'src/common';
 
 @Controller('users')
 @UseInterceptors(ResponseInterceptor<User>)
@@ -62,28 +59,7 @@ export class UserController {
 
   @Post('avatar')
   @Auth()
-  @UseInterceptors(
-    FileInterceptor('file', {
-      limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
-      fileFilter: (req, file, cb) => {
-        if (file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
-          cb(null, true);
-        } else {
-          cb(
-            new BadRequestException(
-              'Only image files (jpg, jpeg, png, webp) are allowed!',
-            ),
-            false,
-          );
-        }
-      },
-    }),
-  )
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'Avatar upload',
-    type: FileUploadDto,
-  })
+  @ImageUpload()
   uploadAvatar(
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: User,
