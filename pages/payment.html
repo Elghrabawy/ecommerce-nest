@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Test - Stripe</title>
+
+  <script src="https://js.stripe.com/v3/"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    form {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #5469d4;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 4px;
+      margin-top: 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #4354a8;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    #error-message {
+      color: #df1b41;
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <form id="payment-form">
+    <h2>Complete Payment</h2>
+
+    <div id="payment-element"></div>
+
+    <button id="submit">Pay Now</button>
+    <div id="error-message"></div>
+  </form>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const publishableKey = urlParams.get('pk');
+    const clientSecret = urlParams.get('clientSecret');
+
+    // Validate required parameters
+    const errorMessage = document.getElementById('error-message');
+    const submitBtn = document.getElementById('submit');
+    const paymentElementDiv = document.getElementById('payment-element');
+
+    if (!publishableKey || !clientSecret) {
+      errorMessage.textContent = 'Payment information is incomplete. Please try again.';
+      errorMessage.style.display = 'block';
+      submitBtn.disabled = true;
+      paymentElementDiv.innerHTML = '<p style="color: #df1b41; text-align: center;">Missing payment parameters (pk and clientSecret)</p>';
+    } else {
+      const stripe = Stripe(publishableKey);
+
+      const elements = stripe.elements({ clientSecret });
+      const paymentElement = elements.create('payment');
+
+      // Mount payment element
+      paymentElement.mount('#payment-element');
+
+      // Handle form submission
+      const form = document.getElementById('payment-form');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Disable button and change text during processing
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processing...';
+        errorMessage.textContent = '';
+
+        // Confirm payment
+        const { error } = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            // Redirect URL after successful payment
+            return_url: window.location.origin + window.location.pathname + '?success=true',
+          },
+        });
+
+        // Handle errors (e.g., declined card)
+        if (error) {
+          errorMessage.textContent = error.message;
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Pay Now';
+        }
+      });
+    }
+
+    // Check for success parameter to show success message
+    if (urlParams.get('success') === 'true') {
+      errorMessage.style.color = '#22c55e';
+      errorMessage.textContent = 'Payment successful! ✓';
+      submitBtn.style.display = 'none';
+      paymentElementDiv.innerHTML = '<p style="color: #22c55e; text-align: center; font-size: 18px;">✓ Payment completed successfully</p>';
+    }
+  </script>
+
+</body>
+
+</html>
