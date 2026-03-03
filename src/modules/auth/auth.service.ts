@@ -7,7 +7,7 @@ import {
 import { RegisterUserDto } from 'src/modules/user/dtos/register-user.dto';
 import { User } from 'src/modules/user/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
-import { JwtResponse, TokenResponse } from 'src/common/utils/types';
+import { JwtResponse, TokenResponse } from 'src/common/interfaces';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtStrategy } from './strategies/jwt.strategy';

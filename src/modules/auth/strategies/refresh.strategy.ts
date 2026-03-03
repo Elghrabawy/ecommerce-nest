@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { RefreshTokenPayload } from 'src/common/utils/types';
+import { RefreshTokenPayload } from 'src/common/interfaces';
 
 import refreshJwtConfig from 'src/config/refresh-jwt.config';
 
