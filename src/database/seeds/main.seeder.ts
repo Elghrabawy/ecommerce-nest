@@ -11,6 +11,7 @@ import { Order } from 'src/modules/order/entities/order.entity';
 import { OrderItem } from 'src/modules/order/entities/order-item.entity';
 import { Payment } from 'src/modules/payment/entities/payment.entity';
 import { Wishlist } from 'src/modules/wishlist/entities/wishlist.entity';
+import { UserRole } from 'src/common';
 
 export class MainSeeder implements Seeder {
   private async createCategories(dataSource: DataSource): Promise<Category[]> {
@@ -161,8 +162,15 @@ export class MainSeeder implements Seeder {
 
     // 1. Create Users (10 users)
     console.log('👤 Creating users...');
-    const users = await factoryManager.get(User).saveMany(10);
-    
+    const borhom = await factoryManager.get(User).save({
+      name: 'Borhom',
+      email: 'borhom@gmail.com',
+      password_hash: 'Password@123',
+      role: UserRole.ADMIN,
+    });
+
+    const users = [borhom];
+    users.push(...(await factoryManager.get(User).saveMany(9, {})));
 
     // 2. Create Categories with hierarchical structure
     const allCategories = await this.createCategories(dataSource);
