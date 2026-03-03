@@ -41,7 +41,7 @@ export class StripeProvider {
     };
   }
 
-  async (
+  async createPaymentSession(
     amount: number,
     currency: string,
     successUrl: string,

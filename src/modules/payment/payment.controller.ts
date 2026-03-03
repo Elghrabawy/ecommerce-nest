@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Param,
   Body,
   Req,
@@ -16,7 +15,8 @@ import Auth from '../auth/decorators/auth.decorator';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 import { User } from '../user/entities/user.entity';
-import { CreatePaymentSessionDto } from './dto/create-payment-session.dto';
+import AuthRoles from '../auth/decorators/roles.decorator';
+import { UserRole } from 'src/common';
 
 @ApiTags('payments')
 @Controller('payments')
@@ -26,6 +26,7 @@ export class PaymentController {
   @Get()
   @ApiOperation({ summary: 'Get all payments' })
   @ApiResponse({ status: 200, description: 'Payments retrieved successfully' })
+  @AuthRoles(UserRole.ADMIN)
   async getPayments() {
     return this.paymentService.getAllPayments();
   }
@@ -33,6 +34,7 @@ export class PaymentController {
   @Get(':id')
   @ApiOperation({ summary: 'Get payment by ID' })
   @ApiResponse({ status: 200, description: 'Payment retrieved successfully' })
+  @AuthRoles(UserRole.ADMIN)
   async getPaymentById(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.getPaymentById(id);
   }
@@ -51,28 +53,12 @@ export class PaymentController {
     return this.paymentService.createPaymentIntent(user.id, dto);
   }
 
-  @Post('create-session')
-  @ApiOperation({ summary: 'Create a Stripe checkout session for an order' })
-  @ApiResponse({
-    status: 201,
-    description: 'Checkout session created successfully',
-  })
-  @Auth()
-  async createCheckoutSession(
-    @Body() dto: CreatePaymentSessionDto,
-    @CurrentUser() user: User,
-  ) {
-    // TODO: Implement create checkout session
-  }
-
   @Post(':id/refund')
   @ApiOperation({ summary: 'Refund payment' })
   @ApiResponse({ status: 200, description: 'Payment refunded successfully' })
-  async refundPayment(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() refundDto: any,
-  ) {
-    // TODO: Implement refund payment
+  @AuthRoles(UserRole.ADMIN)
+  async refundPayment(@Param('id', ParseIntPipe) id: number) {
+    return this.paymentService.refundPayment(id);
   }
 
   @Get('order/:orderId')
@@ -81,21 +67,9 @@ export class PaymentController {
     status: 200,
     description: 'Order payments retrieved successfully',
   })
-  async getPaymentsByOrderId(@Param('orderId', ParseIntPipe) orderId: number) {
-    // TODO: Implement get payments by order ID
-  }
-
-  @Put(':id/status')
-  @ApiOperation({ summary: 'Update payment status' })
-  @ApiResponse({
-    status: 200,
-    description: 'Payment status updated successfully',
-  })
-  async updatePaymentStatus(
-    @Param('id') id: string,
-    @Body() updateStatusDto: any,
-  ) {
-    // TODO: Implement update payment status
+  @Auth()
+  async getPaymentByOrderId(@Param('orderId', ParseIntPipe) orderId: number) {
+    return this.paymentService.getPaymentByOrderId(orderId);
   }
 
   @Post('webhook')
