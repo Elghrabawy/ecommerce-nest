@@ -63,8 +63,7 @@ export class PaymentService {
     }
 
     // Check for existing payments
-    const existingPayments: Payment[] =
-      (order.payments as Payment[] | undefined) || [];
+    const existingPayments: Payment[] = (order.payments as Payment[]) || [];
 
     // If any payment is already completed, don't allow creating a new intent
     const completedPayment = existingPayments.find(
@@ -322,13 +321,20 @@ export class PaymentService {
     });
   }
 
-  async getPaymentByOrderId(orderId: number): Promise<Payment> {
+  async getPaymentByOrderId(orderId: number, userId: number): Promise<Payment> {
     const payment = await this.paymentRepository.findOne({
       where: { order: { id: orderId } },
-      relations: ['order'],
+      relations: ['order', 'order.user'],
     });
+
     if (!payment) {
       throw new NotFoundException(`Payment for Order ID ${orderId} not found`);
+    }
+
+    if (payment?.order.user.id !== userId) {
+      throw new NotFoundException(
+        `Payment for Order ID ${orderId} not found for this user`,
+      );
     }
 
     return payment;

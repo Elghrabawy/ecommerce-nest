@@ -188,16 +188,22 @@ export class OrderService {
     await this.orderRepository.save(order);
   }
 
-  async cancelOrder(orderId: number) {
+  async cancelOrder(orderId: number, userId: number) {
     await this.dataSource.manager.transaction(async (manager) => {
       const order = await manager.findOne(Order, {
         where: { id: orderId },
-        relations: ['items', 'items.product'],
+        relations: ['items', 'items.product', 'user'],
         lock: { mode: 'pessimistic_write' },
       });
 
       if (!order) {
         throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      if (order.user.id !== userId) {
+        throw new BadRequestException(
+          `You are not authorized to cancel order with ID ${orderId}`,
+        );
       }
 
       if (!OrderService.CANCELLABLE_STATUSES.includes(order.status)) {

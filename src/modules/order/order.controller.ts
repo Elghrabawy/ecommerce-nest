@@ -68,7 +68,10 @@ export class OrderController {
   @Delete(':id/cancel')
   @ApiOperation({ summary: 'Cancel order' })
   @Auth()
-  async cancelOrder(@Param('id', ParseIntPipe) id: number) {
-    return this.orderService.cancelOrder(id);
+  async cancelOrder(
+    @CurrentUser() user: User,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.orderService.cancelOrder(id, user.id);
   }
 }

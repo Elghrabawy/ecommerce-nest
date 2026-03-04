@@ -57,8 +57,11 @@ export class PaymentController {
   @Get('order/:orderId')
   @ApiOperation({ summary: 'Get payments by order ID' })
   @Auth()
-  async getPaymentByOrderId(@Param('orderId', ParseIntPipe) orderId: number) {
-    return this.paymentService.getPaymentByOrderId(orderId);
+  async getPaymentByOrderId(
+    @Param('orderId', ParseIntPipe) orderId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.paymentService.getPaymentByOrderId(orderId, user.id);
   }
 
   @Post('webhook')
