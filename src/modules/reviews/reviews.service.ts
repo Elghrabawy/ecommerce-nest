@@ -8,10 +8,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Review } from './entities/review.entity';
-import { CreateReviewDto, UpdateReviewDto } from './dto';
+import { CreateReviewDto, UpdateReviewDto, ReviewFilterDto } from './dto';
 import { PaginationDto } from 'src/common';
 import { PaginationHelper } from 'src/common/utils';
 import { Product } from '../product/entities/product.entity';
+import { SelectQueryBuilder } from 'typeorm';
 import { Order } from '../order/entities/order.entity';
 import { OrderStatus } from 'src/common/enums';
 
@@ -28,12 +29,66 @@ export class ReviewsService {
     private readonly orderRepository: Repository<Order>,
   ) {}
 
-  async getAllReviews(pagination: PaginationDto): Promise<Review[]> {
-    const query = this.reviewRepository
+  private applyFilters(
+    query: SelectQueryBuilder<Review>,
+    filters?: ReviewFilterDto,
+  ): SelectQueryBuilder<Review> {
+    if (!filters) {
+      return query;
+    }
+
+    if (filters.rating) {
+      query = query.andWhere('review.rating = :rating', {
+        rating: filters.rating,
+      });
+    }
+
+    if (filters.minRating) {
+      query = query.andWhere('review.rating >= :minRating', {
+        minRating: filters.minRating,
+      });
+    }
+
+    if (filters.maxRating) {
+      query = query.andWhere('review.rating <= :maxRating', {
+        maxRating: filters.maxRating,
+      });
+    }
+
+    if (filters.search) {
+      query = query.andWhere('review.comment ILIKE :search', {
+        search: `%${filters.search}%`,
+      });
+    }
+
+    if (filters.sortBy) {
+      const order = filters.sortOrder === 'desc' ? 'DESC' : 'ASC';
+      const field =
+        filters.sortBy === 'rating'
+          ? 'review.rating'
+          : filters.sortBy === 'createdAt'
+            ? 'review.created_at'
+            : 'review.updated_at';
+      query = query.orderBy(field, order);
+    }
+
+    return query;
+  }
+
+  async getAllReviews(
+    pagination: PaginationDto,
+    filters?: ReviewFilterDto,
+  ): Promise<Review[]> {
+    let query = this.reviewRepository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.user', 'user')
-      .leftJoinAndSelect('review.product', 'product')
-      .orderBy('review.created_at', 'DESC');
+      .leftJoinAndSelect('review.product', 'product');
+
+    query = this.applyFilters(query, filters);
+
+    if (!filters?.sortBy) {
+      query = query.orderBy('review.created_at', 'DESC');
+    }
 
     const reviews = await PaginationHelper.paginate(
       query,
@@ -152,12 +207,18 @@ export class ReviewsService {
   async getReviewsByProductId(
     productId: number,
     pagination?: PaginationDto,
+    filters?: ReviewFilterDto,
   ): Promise<Review[]> {
-    const query = this.reviewRepository
+    let query = this.reviewRepository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.user', 'user')
-      .where('review.productId = :productId', { productId })
-      .orderBy('review.created_at', 'DESC');
+      .where('review.productId = :productId', { productId });
+
+    query = this.applyFilters(query, filters);
+
+    if (!filters?.sortBy) {
+      query = query.orderBy('review.created_at', 'DESC');
+    }
 
     const reviews = await PaginationHelper.paginate(
       query,

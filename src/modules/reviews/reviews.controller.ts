@@ -10,9 +10,9 @@ import {
   Query,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service';
-import { CreateReviewDto, UpdateReviewDto } from './dto';
+import { CreateReviewDto, UpdateReviewDto, ReviewFilterDto } from './dto';
 import { PaginationDto } from 'src/common';
 import Auth from '../auth/decorators/auth.decorator';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
@@ -27,9 +27,12 @@ export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all reviews' })
-  async getReviews(@Query() pagination: PaginationDto) {
-    return await this.reviewsService.getAllReviews(pagination);
+  @ApiOperation({ summary: 'Get all reviews with optional filters' })
+  async getReviews(
+    @Query() pagination: PaginationDto,
+    @Query() filters?: ReviewFilterDto,
+  ) {
+    return await this.reviewsService.getAllReviews(pagination, filters);
   }
 
   @Get(':id')
@@ -71,14 +74,16 @@ export class ReviewsController {
   }
 
   @Get('product/:productId')
-  @ApiOperation({ summary: 'Get reviews by product ID' })
+  @ApiOperation({ summary: 'Get reviews by product ID with optional filters' })
   async getReviewsByProductId(
     @Param('productId', ParseIntPipe) productId: number,
     @Query() pagination: PaginationDto,
+    @Query() filters?: ReviewFilterDto,
   ) {
     return await this.reviewsService.getReviewsByProductId(
       productId,
       pagination,
+      filters,
     );
   }
 
