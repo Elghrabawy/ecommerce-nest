@@ -9,7 +9,7 @@ import {
   Headers,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import Auth from '../auth/decorators/auth.decorator';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
@@ -25,7 +25,6 @@ export class PaymentController {
 
   @Get()
   @ApiOperation({ summary: 'Get all payments' })
-  @ApiResponse({ status: 200, description: 'Payments retrieved successfully' })
   @AuthRoles(UserRole.ADMIN)
   async getPayments() {
     return this.paymentService.getAllPayments();
@@ -33,7 +32,6 @@ export class PaymentController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get payment by ID' })
-  @ApiResponse({ status: 200, description: 'Payment retrieved successfully' })
   @AuthRoles(UserRole.ADMIN)
   async getPaymentById(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.getPaymentById(id);
@@ -41,10 +39,6 @@ export class PaymentController {
 
   @Post('create-intent')
   @ApiOperation({ summary: 'Create a Stripe payment intent for an order' })
-  @ApiResponse({
-    status: 201,
-    description: 'Payment intent created successfully',
-  })
   @Auth()
   async createPaymentIntent(
     @Body() dto: CreatePaymentIntentDto,
@@ -55,7 +49,6 @@ export class PaymentController {
 
   @Post(':id/refund')
   @ApiOperation({ summary: 'Refund payment' })
-  @ApiResponse({ status: 200, description: 'Payment refunded successfully' })
   @AuthRoles(UserRole.ADMIN)
   async refundPayment(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.refundPayment(id);
@@ -63,10 +56,6 @@ export class PaymentController {
 
   @Get('order/:orderId')
   @ApiOperation({ summary: 'Get payments by order ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Order payments retrieved successfully',
-  })
   @Auth()
   async getPaymentByOrderId(@Param('orderId', ParseIntPipe) orderId: number) {
     return this.paymentService.getPaymentByOrderId(orderId);

@@ -8,7 +8,7 @@ import {
   Body,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { OrderService } from './order.service';
 import { Order } from './entities/order.entity';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
@@ -26,7 +26,6 @@ export class OrderController {
 
   @Get()
   @ApiOperation({ summary: 'Get all orders' })
-  @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
   @AuthRoles(UserRole.ADMIN)
   async getOrders(): Promise<Order[]> {
     return this.orderService.getAllOrders();
@@ -34,10 +33,6 @@ export class OrderController {
 
   @Get('/user')
   @ApiOperation({ summary: 'Get orders by user ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'User orders retrieved successfully',
-  })
   @Auth()
   async getOrdersByUserId(@CurrentUser() user: User): Promise<Order[]> {
     return this.orderService.getOrdersByUserId(user.id);
@@ -45,7 +40,6 @@ export class OrderController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get order by ID' })
-  @ApiResponse({ status: 200, description: 'Order retrieved successfully' })
   @AuthRoles(UserRole.ADMIN)
   async getOrderById(@Param('id', ParseIntPipe) id: number): Promise<Order> {
     return this.orderService.getOrderById(id);
@@ -53,7 +47,6 @@ export class OrderController {
 
   @Post()
   @ApiOperation({ summary: 'Create new order' })
-  @ApiResponse({ status: 201, description: 'Order created successfully' })
   @Auth()
   async createOrder(
     @Body() createOrderDto: CreateOrderDto,
@@ -64,10 +57,6 @@ export class OrderController {
 
   @Put(':id/status')
   @ApiOperation({ summary: 'Update order status' })
-  @ApiResponse({
-    status: 200,
-    description: 'Order status updated successfully',
-  })
   @AuthRoles(UserRole.ADMIN)
   async updateOrderStatus(
     @Param('id', ParseIntPipe) id: number,
@@ -78,7 +67,6 @@ export class OrderController {
 
   @Delete(':id/cancel')
   @ApiOperation({ summary: 'Cancel order' })
-  @ApiResponse({ status: 200, description: 'Order cancelled successfully' })
   @Auth()
   async cancelOrder(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.cancelOrder(id);
