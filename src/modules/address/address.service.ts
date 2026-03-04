@@ -1,14 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Address } from './entities/address.entity';
 import { CreateAddressDto, UpdateAddressDto } from './dto';
 import { User } from '../user/entities/user.entity';
+import { PaginationDto, PaginationHelper } from 'src/common';
 
 @Injectable()
 export class AddressService {
@@ -23,14 +19,32 @@ export class AddressService {
     return await this.addressRepository.find({ relations: ['user'] });
   }
 
-  async findByUser(userId: number): Promise<Address[]> {
-    return await this.addressRepository.find({
-      where: {
-        user: {
-          id: userId,
-        },
-      },
-    });
+  async findByUser(
+    userId: number,
+    pagination: PaginationDto,
+  ): Promise<Address[]> {
+    const query = this.addressRepository
+      .createQueryBuilder('address')
+      .leftJoinAndSelect('address.user', 'user')
+      .where('address.userId = :userId', { userId });
+
+    const addresses = await PaginationHelper.paginate(
+      query,
+      pagination.page,
+      pagination.limit,
+    );
+    return addresses.data;
+  }
+
+  /**
+   * Get query builder for user addresses (returns query, not results)
+   * Useful for further filtering or pagination
+   */
+  findByUserQuery(userId: number): SelectQueryBuilder<Address> {
+    return this.addressRepository
+      .createQueryBuilder('address')
+      .leftJoinAndSelect('address.user', 'user')
+      .where('address.userId = :userId', { userId });
   }
 
   async findOne(id: number): Promise<Address> {
