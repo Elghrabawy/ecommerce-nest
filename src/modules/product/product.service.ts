@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
   NotImplementedException,
 } from '@nestjs/common';
@@ -12,9 +13,12 @@ import { ProductFilterDto } from './dto/product-filter.dto';
 import { SelectQueryBuilder } from 'typeorm/browser';
 import { PaginationDto } from 'src/common/dto';
 import { generateSlug } from './../../common/utils';
+import { PaginationHelper } from 'src/common/utils';
 
 @Injectable()
 export class ProductService {
+  private readonly logger = new Logger(ProductService.name);
+
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
@@ -61,40 +65,29 @@ export class ProductService {
     return query;
   }
 
-  applyPagination(
-    query: SelectQueryBuilder<Product>,
-    page?: number,
-    limit?: number,
-  ): SelectQueryBuilder<Product> {
-    const pageNumber = page && page > 0 ? page : 1;
-    const pageSize = limit && limit > 0 ? limit : 20;
-
-    const paginatedQuery = query
-      .skip((pageNumber - 1) * pageSize)
-      .take(pageSize);
-
-    return paginatedQuery;
-  }
-
   async getAllProducts(
-    pagination?: PaginationDto,
+    pagination: PaginationDto,
     filters?: ProductFilterDto,
   ): Promise<Product[]> {
-    const query = this.productRepository.createQueryBuilder('product');
-
-    const filteredQuery = this.applyFilters(query, filters);
-
-    const paginatedQuery = this.applyPagination(
-      filteredQuery,
-      pagination?.page,
-      pagination?.limit,
+    this.logger.debug(
+      `Fetching products with filters: ${JSON.stringify(filters)} and pagination: ${JSON.stringify(pagination)}`,
     );
 
-    const finalQuery = paginatedQuery
-      .innerJoin('product.category', 'category', 'category.isActive = true')
-      .addSelect(['category.id', 'category.name']);
+    let query = this.productRepository.createQueryBuilder('product');
 
-    return await finalQuery.getMany();
+    query = this.applyFilters(query, filters);
+    query = PaginationHelper.applyPagination(
+      query,
+      pagination.page,
+      pagination.limit,
+    );
+
+    const products = await query
+      .innerJoin('product.category', 'category', 'category.isActive = true')
+      .addSelect(['category.id', 'category.name'])
+      .getMany();
+
+    return products;
   }
 
   async getProductById(productId: number): Promise<Product> {
@@ -164,11 +157,21 @@ export class ProductService {
     throw new NotImplementedException();
   }
 
-  async getProductsByCategory(categoryId: number): Promise<Product[]> {
-    const products = await this.productRepository.find({
-      where: { category: { id: categoryId } },
-    });
-    return products;
+  async getProductsByCategory(
+    categoryId: number,
+    pagination: PaginationDto,
+  ): Promise<Product[]> {
+    const query = this.productRepository
+      .createQueryBuilder('product')
+      .where('product.categoryId = :categoryId', { categoryId });
+
+    const products = await PaginationHelper.paginate(
+      query,
+      pagination.page,
+      pagination.limit,
+    );
+
+    return products.data;
   }
 
   async updateProductStock(
@@ -222,19 +225,17 @@ export class ProductService {
     return products;
   }
 
-  async getRelatedProducts(productId: number): Promise<Product[]> {
+  async getRelatedProducts(
+    productId: number,
+    pagination: PaginationDto,
+  ): Promise<Product[]> {
     const product = await this.getProductById(productId);
 
     if (!product.category) {
       return [];
     }
 
-    console.log(
-      'Finding related products for category:',
-      product.category.name,
-    );
-
-    const relatedProducts = await this.productRepository
+    const query = this.productRepository
       .createQueryBuilder('product')
       .where('product.categoryId = :categoryId', {
         categoryId: product.category.id,
@@ -242,10 +243,15 @@ export class ProductService {
       .andWhere('product.id != :productId', {
         productId: product.id,
       })
-      .take(10)
-      .getMany();
+      .take(10);
 
-    return relatedProducts;
+    const products = await PaginationHelper.paginate(
+      query,
+      pagination.page,
+      pagination.limit,
+    );
+
+    return products.data;
   }
 
   async getProductReviews(productId: number): Promise<any[]> {

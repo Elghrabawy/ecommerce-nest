@@ -11,19 +11,14 @@ import {
   ParseIntPipe,
   UseInterceptors,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiQuery,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductFilterDto } from './dto/product-filter.dto';
 import { PaginationDto } from 'src/common/dto';
 import { ResponseInterceptor } from 'src/common/interceptors';
+import AuthRoles from '../auth/decorators/roles.decorator';
 @ApiTags('products')
 @Controller('products')
 @UseInterceptors(ResponseInterceptor<Product>)
@@ -33,16 +28,13 @@ export class ProductController {
   @Get()
   @ApiOperation({ summary: 'Get all products' })
   async getProducts(
-    @Query() pagination?: PaginationDto,
+    @Query() pagination: PaginationDto,
     @Query() filters?: ProductFilterDto,
   ): Promise<Product[]> {
     console.log('Received pagination:', pagination);
     console.log('Received filters:', filters);
 
-    return (await this.productService.getAllProducts(
-      pagination,
-      filters,
-    )) as Product[];
+    return await this.productService.getAllProducts(pagination, filters);
   }
 
   @Get(':id')
@@ -86,8 +78,9 @@ export class ProductController {
   @ApiOperation({ summary: 'Get related products' })
   async getRelatedProducts(
     @Param('id', ParseIntPipe) id: number,
+    @Query() pagination: PaginationDto,
   ): Promise<Product[]> {
-    return await this.productService.getRelatedProducts(id);
+    return await this.productService.getRelatedProducts(id, pagination);
   }
 
   @Put(':id/stock')
@@ -111,10 +104,11 @@ export class ProductController {
   @ApiOperation({ summary: 'Get products by category' })
   async getProductsByCategory(
     @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Query() pagination: PaginationDto,
   ): Promise<Product[]> {
-    const products =
-      await this.productService.getProductsByCategory(categoryId);
-
-    return products;
+    return await this.productService.getProductsByCategory(
+      categoryId,
+      pagination,
+    );
   }
 }
