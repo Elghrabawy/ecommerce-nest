@@ -14,3 +14,24 @@ export interface multiDataResponse<T> {
   count: number;
   data: Partial<T>[];
 }
+
+/**
+ * Pagination metadata
+ */
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+/**
+ * Paginated response with metadata
+ */
+export interface PaginatedResponse<T> {
+  status: 'success';
+  data: T[];
+  meta: PaginationMeta;
+}
