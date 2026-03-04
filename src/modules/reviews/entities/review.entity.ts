@@ -1,19 +1,11 @@
 import { Product } from 'src/modules/product/entities/product.entity';
 import { User } from 'src/modules/user/entities/user.entity';
-import {
-  Check,
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { BaseEntity } from 'src/common/entities';
+import { Check, Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity('reviews')
 @Check('"rating" >= 1 AND "rating" <= 5')
-export class Review {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class Review extends BaseEntity {
   @Column({
     type: 'int',
   })
@@ -22,9 +14,15 @@ export class Review {
   @Column({ type: 'text', nullable: true })
   comment: string | null;
 
-  @ManyToOne((type) => Product, (product) => product.reviews)
+  @Column()
+  productId: number;
+
+  @Column()
+  userId: number;
+
+  @ManyToOne(() => Product, (product) => product.reviews)
   product: Product;
 
-  @ManyToOne((type) => User, (user) => user.reviews)
+  @ManyToOne(() => User, (user) => user.reviews)
   user: User;
 }
