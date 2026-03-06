@@ -10,7 +10,7 @@
     {
       "src": "/(.*)",
       "dest": "dist/main.js",
-      "method": [
+      "methods": [
         "GET",
         "POST",
         "PUT",
