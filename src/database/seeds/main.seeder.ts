@@ -210,13 +210,27 @@ export class MainSeeder implements Seeder {
     console.log('🛍️ Creating cart items...');
     for (const cart of carts) {
       const itemCount = Math.floor(Math.random() * 6); // 0-5 items
+      const usedProducts = new Set<number>(); // Track products already in this cart
+      
       for (let i = 0; i < itemCount; i++) {
-        const randomProduct =
-          products[Math.floor(Math.random() * products.length)];
-        await factoryManager.get(CartItem).save({
-          cart,
-          product: randomProduct,
-        });
+        // Keep trying until we find a product not yet in this cart
+        let randomProduct;
+        let attempts = 0;
+        do {
+          randomProduct = products[Math.floor(Math.random() * products.length)];
+          attempts++;
+          // Break if we've tried too many times (shouldn't happen with 50 products)
+          if (attempts > 100) break;
+        } while (usedProducts.has(randomProduct.id));
+        
+        // Only add if we found a unique product
+        if (!usedProducts.has(randomProduct.id)) {
+          await factoryManager.get(CartItem).save({
+            cart,
+            product: randomProduct,
+          });
+          usedProducts.add(randomProduct.id);
+        }
       }
     }
 
