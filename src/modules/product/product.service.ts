@@ -10,10 +10,10 @@ import { EntityManager, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductFilterDto } from './dto/product-filter.dto';
-import { SelectQueryBuilder } from 'typeorm/browser';
 import { PaginationDto } from 'src/common/dto';
 import { generateSlug } from './../../common/utils';
 import { PaginationHelper } from 'src/common/utils';
+import { SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class ProductService {
@@ -73,16 +73,17 @@ export class ProductService {
       `Fetching products with filters: ${JSON.stringify(filters)} and pagination: ${JSON.stringify(pagination)}`,
     );
 
-    let query = this.productRepository.createQueryBuilder('product');
+    const query: SelectQueryBuilder<Product> =
+      this.productRepository.createQueryBuilder('product');
 
-    query = this.applyFilters(query, filters);
-    query = PaginationHelper.applyPagination(
-      query,
+    const filterQuery = this.applyFilters(query, filters);
+    const paginationQuery = PaginationHelper.applyPagination(
+      filterQuery,
       pagination.page,
       pagination.limit,
     );
 
-    const products = await query
+    const products = await paginationQuery
       .innerJoin('product.category', 'category', 'category.isActive = true')
       .addSelect(['category.id', 'category.name'])
       .getMany();
