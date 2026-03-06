@@ -17,6 +17,9 @@ async function bootstrap() {
       logger: ['error', 'warn', 'log'],
     });
 
+    // Enable CORS first
+    nestApp.enableCors();
+
     nestApp.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -42,11 +45,24 @@ async function bootstrap() {
       )
       .build();
 
-    const documentFactory = () =>
-      SwaggerModule.createDocument(nestApp, swaggerDocument);
-    SwaggerModule.setup('api', nestApp, documentFactory);
+    const document = SwaggerModule.createDocument(nestApp, swaggerDocument);
+    
+    // Serve Swagger JSON
+    expressApp.get('/api-json', (req, res) => {
+      res.json(document);
+    });
+    
+    // Setup Swagger UI
+    SwaggerModule.setup('api', nestApp, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+        url: '/api-json',
+      },
+      customSiteTitle: 'First NestJS API Documentation',
+      customCss: '.swagger-ui .topbar { display: none }',
+      customfavIcon: 'https://nestjs.com/img/logo-small.svg',
+    });
 
-    nestApp.enableCors();
     await nestApp.init();
   }
   return expressApp;
