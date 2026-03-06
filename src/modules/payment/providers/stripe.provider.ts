@@ -25,15 +25,22 @@ export class StripeProvider {
     amount: number,
     currency: string,
     metadata: Record<string, string>,
+    idempotencyKey?: string,
   ): Promise<{ clientSecret: string; paymentIntentId: string }> {
-    const paymentIntent = await this.stripe.paymentIntents.create({
-      amount: Math.round(amount * 100),
-      currency,
-      metadata,
-      automatic_payment_methods: {
-        enabled: true,
+    const paymentIntent = await this.stripe.paymentIntents.create(
+      {
+        amount: Math.round(amount * 100),
+        currency,
+        metadata,
+        automatic_payment_methods: {
+          enabled: true,
+        },
       },
-    });
+      {
+        idempotencyKey:
+          idempotencyKey || `pi_${metadata.orderId}_${Date.now()}`,
+      },
+    );
 
     return {
       clientSecret: paymentIntent.client_secret as string,

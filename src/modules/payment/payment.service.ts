@@ -21,6 +21,7 @@ import {
   PaymentSuccessEvent,
   RefundedEvent,
 } from '../mail/events/mail.events';
+import { WebhookEvent } from './entities/webhook-event.entity';
 
 @Injectable()
 export class PaymentService {
@@ -31,6 +32,8 @@ export class PaymentService {
     private readonly paymentRepository: Repository<Payment>,
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
+    @InjectRepository(WebhookEvent)
+    private readonly webhookEventRepository: Repository<WebhookEvent>,
     private readonly dataSource: DataSource,
     private readonly stripeProvider: StripeProvider,
     private readonly configService: ConfigService,
@@ -108,6 +111,8 @@ export class PaymentService {
 
     const currency = this.configService.get<string>('stripe.currency', 'usd');
 
+    const idempotencyKey = `order_${order.id}_${userId}_${Date.now()}`;
+
     const { clientSecret, paymentIntentId } =
       await this.stripeProvider.createPaymentIntent(
         order.totalAmount,
@@ -116,6 +121,7 @@ export class PaymentService {
           orderId: order.id.toString(),
           userId: userId.toString(),
         },
+        idempotencyKey,
       );
 
     // Update pending payment or create new payment record
@@ -150,99 +156,157 @@ export class PaymentService {
     const event = this.stripeProvider.constructWebhookEvent(payload, signature);
     this.logger.debug(`Received Stripe webhook event: ${event.type}`);
 
-    switch (event.type) {
-      case 'payment_intent.succeeded':
-        await this.handlePaymentSuccess(event.data.object);
-        break;
+    const existingEvent = await this.webhookEventRepository.findOne({
+      where: { eventId: event.id },
+    });
 
-      case 'payment_intent.payment_failed':
-        await this.handlePaymentFailure(event.data.object);
-        break;
-
-      case 'payment_intent.created':
-        this.logger.debug(
-          `PaymentIntent created with ID: ${event.data.object.id} and amount: ${event.data.object.amount}`,
+    if (existingEvent) {
+      if (existingEvent.processed) {
+        this.logger.warn(
+          `Stripe webhook event ${event.id} has already been processed. Ignoring duplicate.`,
         );
-        break;
+        return;
+      }
 
-      default:
-        this.logger.warn(`Unhandled Stripe event type: ${event.type}`);
+      existingEvent.retryCount += 1;
+      await this.webhookEventRepository.save(existingEvent);
+    } else {
+      const newEvent = this.webhookEventRepository.create({
+        eventId: event.id,
+        eventType: event.type,
+        payload: event.data.object,
+        receivedAt: new Date(),
+        processed: false,
+        retryCount: 0,
+      });
+      await this.webhookEventRepository.save(newEvent);
+    }
+
+    try {
+      switch (event.type) {
+        case 'payment_intent.succeeded':
+          await this.handlePaymentSuccess(event.data.object);
+          break;
+
+        case 'payment_intent.payment_failed':
+          await this.handlePaymentFailure(event.data.object);
+          break;
+
+        case 'payment_intent.created':
+          this.logger.debug(
+            `PaymentIntent created with ID: ${event.data.object.id} and amount: ${event.data.object.amount}`,
+          );
+          break;
+
+        default:
+          this.logger.warn(`Unhandled Stripe event type: ${event.type}`);
+      }
+
+      await this.webhookEventRepository.update(
+        { eventId: event.id },
+        { processed: true, processedAt: new Date() },
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(
+        `Error processing Stripe webhook event ${event.id}: ${errorMessage}`,
+      );
+      await this.webhookEventRepository.update(
+        { eventId: event.id },
+        { errorMessage, processedAt: new Date() },
+      );
+
+      throw error;
     }
   }
 
   async handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
-    const payment = await this.paymentRepository.findOne({
-      where: { paymentIntentId: paymentIntent.id },
-      relations: ['order', 'order.user'],
-    });
+    await this.dataSource.manager.transaction(async (manager) => {
+      const payment = await manager.findOne(Payment, {
+        where: { paymentIntentId: paymentIntent.id },
+        relations: ['order', 'order.user'],
+        lock: { mode: 'pessimistic_write' },
+      });
 
-    if (!payment) {
-      this.logger.error(
-        `Payment record not found for PaymentIntent ID: ${paymentIntent.id}`,
-      );
-      return;
-    }
+      if (!payment) {
+        this.logger.error(
+          `Payment record not found for PaymentIntent ID: ${paymentIntent.id}`,
+        );
+        return;
+      }
 
-    if (payment.status === PaymentStatus.COMPLETED) {
-      this.logger.warn(
-        `Payment for PaymentIntent ID: ${paymentIntent.id} is already marked as completed`,
-      );
-      return;
-    }
+      if (payment.status === PaymentStatus.COMPLETED) {
+        this.logger.warn(
+          `Payment for PaymentIntent ID: ${paymentIntent.id} is already marked as completed`,
+        );
+        return;
+      }
 
-    this.eventEmitter.emit(
-      'payment.success',
-      new PaymentSuccessEvent(
-        payment.order.user.email,
-        payment.order.id,
-        payment.amount,
-      ),
-    );
+      const order = await manager.findOne(Order, {
+        where: { id: payment.order.id },
+        lock: { mode: 'pessimistic_write' },
+      });
 
-    const order = payment.order;
+      if (!order) {
+        this.logger.error(`Order with ID ${payment.order.id} not found`);
+        return;
+      }
 
-    // Check if order was expired or cancelled while payment was in progress
-    if (
-      order.status === OrderStatus.EXPIRED ||
-      order.status === OrderStatus.CANCELLED
-    ) {
-      this.logger.warn(
-        `Order ${order.id} was ${order.status} while payment was in progress. Auto-refunding payment ${payment.id}.`,
-      );
+      // Check if order was expired or cancelled while payment was in progress
+      if (
+        order.status === OrderStatus.EXPIRED ||
+        order.status === OrderStatus.CANCELLED
+      ) {
+        this.logger.warn(
+          `Order ${order.id} was ${order.status} while payment was in progress. Auto-refunding payment ${payment.id}.`,
+        );
 
-      await this.stripeProvider.createRefund(paymentIntent.id);
-      this.eventEmitter.emit(
-        'payment.refunded',
-        new RefundedEvent(order.user.email, order.id, payment.amount),
-      );
+        await this.stripeProvider.createRefund(paymentIntent.id);
 
-      payment.status = PaymentStatus.REFUNDED;
-      payment.refundedAmount = payment.amount;
-      payment.refundedAt = new Date();
+        payment.status = PaymentStatus.REFUNDED;
+        payment.refundedAmount = payment.amount;
+        payment.refundedAt = new Date();
+        payment.processedAt = new Date();
+        await manager.save(payment);
+
+        // Emit refund event after successful transaction
+        this.eventEmitter.emit(
+          'payment.refunded',
+          new RefundedEvent(payment.order.user.email, order.id, payment.amount),
+        );
+
+        return;
+      }
+
+      payment.metadata = {
+        ...payment.metadata,
+        stripePaymentMethodId:
+          typeof paymentIntent.payment_method === 'string'
+            ? paymentIntent.payment_method
+            : paymentIntent.payment_method?.id,
+      };
+      payment.status = PaymentStatus.COMPLETED;
+      payment.providerTransactionId = paymentIntent.id;
       payment.processedAt = new Date();
+      await manager.save(payment);
 
-      await this.paymentRepository.save(payment);
-      return;
-    }
+      order.status = OrderStatus.PAID;
+      await manager.save(order);
 
-    payment.status = PaymentStatus.COMPLETED;
-    payment.providerTransactionId = paymentIntent.id;
-    payment.processedAt = new Date();
-    await this.paymentRepository.save(payment);
-    payment.metadata = {
-      ...payment.metadata,
-      stripePaymentMethodId:
-        typeof paymentIntent.payment_method === 'string'
-          ? paymentIntent.payment_method
-          : paymentIntent.payment_method?.id,
-    };
+      this.logger.log(
+        `Payment ${payment.id} completed. Order ${order.id} marked as PAID`,
+      );
 
-    order.status = OrderStatus.PAID;
-    await this.orderRepository.save(order);
-
-    this.logger.log(
-      `Payment ${payment.id} completed. Order ${order.id} marked as PAID`,
-    );
+      this.eventEmitter.emit(
+        'payment.success',
+        new PaymentSuccessEvent(
+          payment.order.user.email,
+          order.id,
+          payment.amount,
+        ),
+      );
+    });
   }
 
   async handlePaymentFailure(paymentIntent: Stripe.PaymentIntent) {

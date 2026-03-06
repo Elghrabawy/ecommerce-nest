@@ -10,10 +10,17 @@ import { Product } from '../product/entities/product.entity';
 import { AuthModule } from '../auth/auth.module';
 import stripeConfig from 'src/config/stripe.config';
 import { OrderItem } from '../order/entities/order-item.entity';
+import { WebhookEvent } from './entities/webhook-event.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Payment, Order, Product, OrderItem]),
+    TypeOrmModule.forFeature([
+      Payment,
+      Order,
+      Product,
+      OrderItem,
+      WebhookEvent,
+    ]),
     ConfigModule.forFeature(stripeConfig),
     AuthModule,
   ],
