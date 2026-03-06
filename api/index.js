@@ -1,5 +1,6 @@
 const { NestFactory } = require('@nestjs/core');
 const { ExpressAdapter } = require('@nestjs/platform-express');
+const { SwaggerModule, DocumentBuilder } = require('@nestjs/swagger');
 const express = require('express');
 const { AppModule } = require('../dist/app.module');
 const { ValidationPipe } = require('@nestjs/common');
@@ -23,6 +24,27 @@ async function bootstrap() {
         transform: true,
       }),
     );
+
+    // Setup Swagger
+    const swaggerDocument = new DocumentBuilder()
+      .setTitle('First NestJS API')
+      .setVersion('1.0')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'JWT',
+          description: 'Enter JWT token',
+          in: 'header',
+        },
+        'JWT-auth',
+      )
+      .build();
+
+    const documentFactory = () =>
+      SwaggerModule.createDocument(nestApp, swaggerDocument);
+    SwaggerModule.setup('api', nestApp, documentFactory);
 
     nestApp.enableCors();
     await nestApp.init();
