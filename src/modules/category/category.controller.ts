@@ -17,7 +17,7 @@ import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { Category } from './entities/category.entity';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
-import { ResponseInterceptor } from 'src/common/interceptors';
+import { ResponseInterceptor } from 'src/common';
 
 @ApiTags('categories')
 @Controller('categories')

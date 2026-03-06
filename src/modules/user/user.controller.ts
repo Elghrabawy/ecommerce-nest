@@ -17,7 +17,7 @@ import type { JwtPayload } from 'src/common/interfaces';
 import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums';
 import { User } from './entities/user.entity';
-import { ResponseInterceptor } from 'src/common/interceptors';
+import { ResponseInterceptor } from 'src/common';
 import { ImageUpload } from 'src/common';
 
 @Controller('users')

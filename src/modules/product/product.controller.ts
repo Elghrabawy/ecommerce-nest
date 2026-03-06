@@ -17,7 +17,7 @@ import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductFilterDto } from './dto/product-filter.dto';
 import { PaginationDto } from 'src/common/dto';
-import { ResponseInterceptor } from 'src/common/interceptors';
+import { ResponseInterceptor } from 'src/common';
 import AuthRoles from '../auth/decorators/roles.decorator';
 @ApiTags('products')
 @Controller('products')

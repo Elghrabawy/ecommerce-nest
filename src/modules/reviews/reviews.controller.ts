@@ -17,7 +17,7 @@ import { PaginationDto } from 'src/common';
 import Auth from '../auth/decorators/auth.decorator';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { User } from '../user/entities/user.entity';
-import { ResponseInterceptor } from 'src/common/interceptors';
+import { ResponseInterceptor } from 'src/common';
 import { Review } from './entities/review.entity';
 
 @ApiTags('reviews')

@@ -15,7 +15,7 @@ import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { User } from '../user/entities/user.entity';
 import Auth from '../auth/decorators/auth.decorator';
 import AddToCartDto from './dto/add-to-cart.dto';
-import { ResponseInterceptor } from 'src/common/interceptors';
+import { ResponseInterceptor } from 'src/common';
 
 @ApiTags('cart')
 @Controller('cart')

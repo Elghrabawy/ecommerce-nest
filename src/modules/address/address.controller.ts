@@ -19,9 +19,7 @@ import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { User } from '../user/entities/user.entity';
 import AuthAddress from './decorators/auth-address.decorator';
 import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
-import { UserRole } from 'src/common/enums';
-import { ResponseInterceptor } from 'src/common/interceptors';
-import { PaginationDto } from 'src/common';
+import { UserRole, ResponseInterceptor, PaginationDto } from 'src/common';
 
 @ApiTags('addresses')
 @Controller('addresses')
