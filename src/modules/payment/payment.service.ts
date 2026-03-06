@@ -111,7 +111,7 @@ export class PaymentService {
 
     const currency = this.configService.get<string>('stripe.currency', 'usd');
 
-    const idempotencyKey = `order_${order.id}_${userId}_${Date.now()}`;
+    const idempotencyKey = `order_${order.id}_user_${userId}_v1`;
 
     const { clientSecret, paymentIntentId } =
       await this.stripeProvider.createPaymentIntent(
@@ -222,6 +222,15 @@ export class PaymentService {
   }
 
   async handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
+    // Track if we need to refund after transaction
+    let shouldRefund = false;
+    let refundData: {
+      paymentIntentId: string;
+      email: string;
+      orderId: number;
+      amount: number;
+    } | null = null;
+
     await this.dataSource.manager.transaction(async (manager) => {
       const payment = await manager.findOne(Payment, {
         where: { paymentIntentId: paymentIntent.id },
@@ -259,22 +268,29 @@ export class PaymentService {
         order.status === OrderStatus.CANCELLED
       ) {
         this.logger.warn(
-          `Order ${order.id} was ${order.status} while payment was in progress. Auto-refunding payment ${payment.id}.`,
+          `Order ${order.id} was ${order.status} while payment was in progress. Marking for auto-refund.`,
         );
 
-        await this.stripeProvider.createRefund(paymentIntent.id);
-
+        // Mark payment as refunded in DB first (within transaction)
         payment.status = PaymentStatus.REFUNDED;
         payment.refundedAmount = payment.amount;
         payment.refundedAt = new Date();
         payment.processedAt = new Date();
+        payment.metadata = {
+          ...payment.metadata,
+          refundReason: `Order ${order.status.toLowerCase()}`,
+          refundStatus: 'pending',
+        };
         await manager.save(payment);
 
-        // Emit refund event after successful transaction
-        this.eventEmitter.emit(
-          'payment.refunded',
-          new RefundedEvent(payment.order.user.email, order.id, payment.amount),
-        );
+        // Schedule refund to happen AFTER transaction commits
+        shouldRefund = true;
+        refundData = {
+          paymentIntentId: paymentIntent.id,
+          email: payment.order.user.email,
+          orderId: order.id,
+          amount: payment.amount,
+        };
 
         return;
       }
@@ -294,10 +310,6 @@ export class PaymentService {
       order.status = OrderStatus.PAID;
       await manager.save(order);
 
-      this.logger.log(
-        `Payment ${payment.id} completed. Order ${order.id} marked as PAID`,
-      );
-
       this.eventEmitter.emit(
         'payment.success',
         new PaymentSuccessEvent(
@@ -306,7 +318,39 @@ export class PaymentService {
           payment.amount,
         ),
       );
+
+      this.logger.log(
+        `Payment ${payment.id} completed. Order ${order.id} marked as PAID`,
+      );
     });
+
+    // Process refund AFTER transaction commits (outside DB lock)
+    if (shouldRefund && refundData) {
+      const { paymentIntentId, email, orderId, amount } = refundData;
+      try {
+        await this.stripeProvider.createRefund(paymentIntentId);
+        this.logger.log(
+          `Successfully refunded payment for cancelled/expired order ${orderId}`,
+        );
+        this.eventEmitter.emit(
+          'payment.refunded',
+          new RefundedEvent(email, orderId, amount),
+        );
+      } catch (error) {
+        this.logger.error(
+          `Failed to process Stripe refund for PaymentIntent ${paymentIntentId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
+        // Update payment metadata to indicate refund failure
+        await this.paymentRepository.update(
+          { paymentIntentId },
+          {
+            metadata: () =>
+              `metadata || '{}'::jsonb || '{"refundStatus": "failed", "refundError": "${error instanceof Error ? error.message.replace(/"/g, "'") : 'Unknown error'}"}'::jsonb`,
+          },
+        );
+        // TODO: Queue for retry or alert admin
+      }
+    }
   }
 
   async handlePaymentFailure(paymentIntent: Stripe.PaymentIntent) {
@@ -329,6 +373,7 @@ export class PaymentService {
       return;
     }
 
+    // Emit event before transaction (non-critical, fire-and-forget)
     this.eventEmitter.emit(
       'payment.failed',
       new PaymentFailedEvent(
@@ -337,16 +382,17 @@ export class PaymentService {
         paymentIntent.last_payment_error?.message || 'Payment failed',
       ),
     );
-    payment.status = PaymentStatus.FAILED;
-    payment.failureReason =
-      paymentIntent.last_payment_error?.message || 'Unknown error';
-    payment.processedAt = new Date();
-
-    await this.paymentRepository.save(payment);
 
     await this.dataSource.manager.transaction(async (manager) => {
-      const order = payment.order;
+      // Update payment status
+      payment.status = PaymentStatus.FAILED;
+      payment.failureReason =
+        paymentIntent.last_payment_error?.message || 'Unknown error';
+      payment.processedAt = new Date();
+      await manager.save(payment);
 
+      // Restore stock
+      const order = payment.order;
       for (const item of order.items) {
         await manager.increment(
           Product,
@@ -356,6 +402,7 @@ export class PaymentService {
         );
       }
 
+      // Update order status
       order.status = OrderStatus.FAILED;
       await manager.save(order);
     });
