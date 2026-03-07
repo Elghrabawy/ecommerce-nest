@@ -3,6 +3,8 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
+let cachedServer: any;
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
@@ -37,10 +39,24 @@ async function bootstrap() {
     SwaggerModule.createDocument(app, swaggerDocument);
   SwaggerModule.setup('api', app, documentFactory);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.init();
+  return app.getHttpAdapter().getInstance();
 }
 
-bootstrap().catch((err) => {
-  console.error('Error starting application:', err);
-  process.exit(1);
-});
+export default async function (req: any, res: any) {
+  if (!cachedServer) {
+    cachedServer = await bootstrap();
+  }
+  return cachedServer(req, res);
+}
+
+if (!process.env.VERCEL) {
+  bootstrap().then((instance) => {
+    instance.listen(process.env.PORT ?? 3000, () => {
+      console.log(`Application is running on port ${process.env.PORT ?? 3000}`);
+    });
+  }).catch((err) => {
+    console.error('Error starting application:', err);
+    process.exit(1);
+  });
+}
