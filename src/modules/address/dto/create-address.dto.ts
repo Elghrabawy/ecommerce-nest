@@ -1,14 +1,12 @@
 import {
   IsString,
   IsOptional,
-  IsEnum,
   MaxLength,
   IsPhoneNumber,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateAddressDto {
-
   @ApiProperty({
     description: 'Address title/label',
     example: 'Home Address',

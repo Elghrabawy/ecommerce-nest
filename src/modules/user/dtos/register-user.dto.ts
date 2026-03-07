@@ -20,7 +20,7 @@ export class RegisterUserDto {
 
   @ApiProperty({
     description: 'The email address of the user',
-    example: 'borhom@example.com',
+    example: 'borhom@gmail.com',
   })
   @IsNotEmpty()
   @IsEmail({}, { message: 'the email must be a valid email address' })
@@ -30,7 +30,7 @@ export class RegisterUserDto {
   @ApiProperty({
     description:
       'Password with at least 8 characters, including uppercase, lowercase, number and special character',
-    example: 'MyPass123!',
+    example: 'Password@123',
     minLength: 8,
   })
   @IsString({ message: 'the password must be a string' })

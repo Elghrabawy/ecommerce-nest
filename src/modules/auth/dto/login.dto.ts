@@ -5,7 +5,7 @@ import { Transform } from 'class-transformer';
 export class LoginDto {
   @ApiProperty({
     description: 'The email address of the user',
-    example: 'john.doe@example.com',
+    example: 'borhom@gmail.com',
   })
   @IsNotEmpty()
   @IsEmail({}, { message: 'the email must be a valid email address' })
@@ -14,7 +14,7 @@ export class LoginDto {
 
   @ApiProperty({
     description: 'The password for the user account',
-    example: 'SecurePassword123!',
+    example: 'Password@123',
   })
   @IsNotEmpty()
   @IsString({ message: 'the password must be a string' })

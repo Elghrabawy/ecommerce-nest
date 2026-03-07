@@ -9,7 +9,7 @@ async function bootstrap() {
   });
 
   const swaggerDocument = new DocumentBuilder()
-    .setTitle('First NestJS API')
+    .setTitle('E-commerce API')
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -51,9 +51,7 @@ async function bootstrap() {
     }),
   );
 
-  SwaggerModule.setup('api', app, document);
-
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3500);
 }
 
 bootstrap().catch((err) => {

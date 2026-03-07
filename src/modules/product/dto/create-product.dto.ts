@@ -57,8 +57,8 @@ export class CreateProductDto {
   @ApiPropertyOptional({
     description: 'Product images URLs',
     example: [
-      'https://example.com/image1.jpg',
-      'https://example.com/image2.jpg',
+      'https://www.apple.com/newsroom/images/product/iphone/geo/Apple-iPhone-14-iPhone-14-Plus-hero-220907-geo_Full-Bleed-Image.jpg.xlarge.jpg',
+      'https://2b.com.eg/media/catalog/product/cache/661473ab953cdcdf4c3b607144109b90/i/p/iphone14-6_xgrpghvpmml1eprf.jpg',
     ],
   })
   @IsOptional()
