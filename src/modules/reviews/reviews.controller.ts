@@ -20,7 +20,7 @@ import { User } from '../user/entities/user.entity';
 import { ResponseInterceptor } from '../../common/interceptors';
 import { Review } from './entities/review.entity';
 
-@ApiTags('reviews')
+@ApiTags('Reviews')
 @Controller('reviews')
 @UseInterceptors(ResponseInterceptor<Review>)
 export class ReviewsController {

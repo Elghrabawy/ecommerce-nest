@@ -19,7 +19,7 @@ import { ProductFilterDto } from './dto/product-filter.dto';
 import { PaginationDto } from '../../common/dto';
 import { ResponseInterceptor } from '../../common/interceptors';
 import AuthRoles from '../auth/decorators/roles.decorator';
-@ApiTags('products')
+@ApiTags('Products')
 @Controller('products')
 @UseInterceptors(ResponseInterceptor<Product>)
 export class ProductController {

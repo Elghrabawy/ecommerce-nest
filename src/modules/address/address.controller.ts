@@ -23,7 +23,7 @@ import { UserRole } from '../../common/enums';
 import { ResponseInterceptor } from '../../common/interceptors';
 import { PaginationDto } from '../../common';
 
-@ApiTags('addresses')
+@ApiTags('Addresses')
 @Controller('addresses')
 @UseInterceptors(ResponseInterceptor<Address>)
 export class AddressController {

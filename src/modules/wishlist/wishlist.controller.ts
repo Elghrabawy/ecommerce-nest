@@ -16,7 +16,7 @@ import { Wishlist } from './entities/wishlist.entity';
 import { Product } from '../product/entities/product.entity';
 import { ResponseInterceptor } from '../../common';
 
-@ApiTags('wishlist')
+@ApiTags('Wishlist')
 @Controller('wishlist')
 @Auth()
 @UseInterceptors(ResponseInterceptor<Wishlist | Product[]>)

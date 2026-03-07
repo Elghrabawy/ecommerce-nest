@@ -17,7 +17,7 @@ import Auth from '../auth/decorators/auth.decorator';
 import AddToCartDto from './dto/add-to-cart.dto';
 import { ResponseInterceptor } from '../../common/interceptors';
 
-@ApiTags('cart')
+@ApiTags('Cart')
 @Controller('cart')
 @Auth()
 @UseInterceptors(ResponseInterceptor<any>)

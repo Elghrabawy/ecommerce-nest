@@ -18,7 +18,7 @@ import { User } from '../user/entities/user.entity';
 import AuthRoles from '../auth/decorators/roles.decorator';
 import { UserRole } from '../../common';
 
-@ApiTags('payments')
+@ApiTags('Payments')
 @Controller('payments')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}

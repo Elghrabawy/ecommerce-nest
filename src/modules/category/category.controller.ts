@@ -19,7 +19,7 @@ import { Category } from './entities/category.entity';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 import { ResponseInterceptor } from '../../common/interceptors';
 
-@ApiTags('categories')
+@ApiTags('Categories')
 @Controller('categories')
 @UseInterceptors(ResponseInterceptor<Category>)
 export class CategoryController {
