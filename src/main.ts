@@ -3,8 +3,6 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
-let cachedServer: any;
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
@@ -26,6 +24,24 @@ async function bootstrap() {
     )
     .build();
 
+  const document = SwaggerModule.createDocument(app, swaggerDocument);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      initOAuth: {
+        clientId: 'clientId',
+        clientSecret: 'clientSecret',
+        scopeSeparator: ' ',
+        scopes: ['read', 'write', 'admin'],
+      },
+    },
+    customCssUrl:
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.min.js',
+    ],
+  });
+
   // use global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
@@ -35,28 +51,12 @@ async function bootstrap() {
     }),
   );
 
-  const documentFactory = () =>
-    SwaggerModule.createDocument(app, swaggerDocument);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('api', app, document);
 
-  await app.init();
-  return app.getHttpAdapter().getInstance();
+  await app.listen(process.env.PORT ?? 3000);
 }
 
-export default async function (req: any, res: any) {
-  if (!cachedServer) {
-    cachedServer = await bootstrap();
-  }
-  return cachedServer(req, res);
-}
-
-if (!process.env.VERCEL) {
-  bootstrap().then((instance) => {
-    instance.listen(process.env.PORT ?? 3000, () => {
-      console.log(`Application is running on port ${process.env.PORT ?? 3000}`);
-    });
-  }).catch((err) => {
-    console.error('Error starting application:', err);
-    process.exit(1);
-  });
-}
+bootstrap().catch((err) => {
+  console.error('Error starting application:', err);
+  process.exit(1);
+});
