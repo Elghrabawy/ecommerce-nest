@@ -24,6 +24,24 @@ async function bootstrap() {
     )
     .build();
 
+  const document = SwaggerModule.createDocument(app, swaggerDocument);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      initOAuth: {
+        clientId: 'clientId',
+        clientSecret: 'clientSecret',
+        scopeSeparator: ' ',
+        scopes: ['read', 'write', 'admin'],
+      },
+    },
+    customCssUrl:
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.min.js',
+    ],
+  });
+
   // use global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
@@ -33,11 +51,12 @@ async function bootstrap() {
     }),
   );
 
-  const documentFactory = () =>
-    SwaggerModule.createDocument(app, swaggerDocument);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Error starting application:', err);
+  process.exit(1);
+});

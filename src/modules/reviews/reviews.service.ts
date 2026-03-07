@@ -9,12 +9,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Review } from './entities/review.entity';
 import { CreateReviewDto, UpdateReviewDto, ReviewFilterDto } from './dto';
-import { PaginationDto } from 'src/common';
-import { PaginationHelper } from 'src/common/utils';
+import { PaginationDto } from '../../common';
+import { PaginationHelper } from '../../common/utils';
 import { Product } from '../product/entities/product.entity';
 import { SelectQueryBuilder } from 'typeorm';
 import { Order } from '../order/entities/order.entity';
-import { OrderStatus } from 'src/common/enums';
+import { OrderStatus } from '../../common/enums';
 
 @Injectable()
 export class ReviewsService {

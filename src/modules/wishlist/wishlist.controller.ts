@@ -14,7 +14,7 @@ import { User } from '../user/entities/user.entity';
 import Auth from '../auth/decorators/auth.decorator';
 import { Wishlist } from './entities/wishlist.entity';
 import { Product } from '../product/entities/product.entity';
-import { ResponseInterceptor } from 'src/common';
+import { ResponseInterceptor } from '../../common';
 
 @ApiTags('wishlist')
 @Controller('wishlist')

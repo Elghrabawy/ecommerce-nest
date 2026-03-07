@@ -1,7 +1,7 @@
-import { OrderItem } from 'src/modules/order/entities/order-item.entity';
-import { Review } from 'src/modules/reviews/entities/review.entity';
-import { Category } from 'src/modules/category/entities/category.entity';
-import { BaseEntity } from 'src/common/entities';
+import { OrderItem } from '../../order/entities/order-item.entity';
+import { Review } from '../../reviews/entities/review.entity';
+import { Category } from '../../category/entities/category.entity';
+import { BaseEntity } from '../../../common/entities';
 import {
   Entity,
   Column,

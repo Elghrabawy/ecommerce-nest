@@ -15,6 +15,9 @@ export function createDatabaseConfig() {
     migrations: ['src/database/migrations/*{.ts,.js}'],
     migrationsTableName: 'migrations',
     migrationsRun: false,
+    ssl: {
+      rejectUnauthorized: false,
+    },
     seeds: ['src/database/seeds/**/*{.ts,.js}'],
     factories: ['src/database/seeds/factories/**/*{.ts,.js}'],
   };

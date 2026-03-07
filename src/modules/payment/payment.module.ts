@@ -8,7 +8,7 @@ import { Payment } from './entities/payment.entity';
 import { Order } from '../order/entities/order.entity';
 import { Product } from '../product/entities/product.entity';
 import { AuthModule } from '../auth/auth.module';
-import stripeConfig from 'src/config/stripe.config';
+import stripeConfig from '../../config/stripe.config';
 import { OrderItem } from '../order/entities/order-item.entity';
 import { WebhookEvent } from './entities/webhook-event.entity';
 

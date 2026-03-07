@@ -1,6 +1,6 @@
 import { IsInt, IsPositive, IsEnum, IsNotEmpty, IsUrl } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { PaymentMethod } from 'src/common/enums';
+import { PaymentMethod } from '../../../common/enums';
 
 export class CreatePaymentSessionDto {
   @ApiProperty({ description: 'Order ID to pay for', example: 1 })

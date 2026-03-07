@@ -11,7 +11,7 @@ import { Order } from '../order/entities/order.entity';
 import { StripeProvider } from './providers/stripe.provider';
 import { ConfigService } from '@nestjs/config';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
-import { OrderStatus, PaymentProvider, PaymentStatus } from 'src/common/enums';
+import { OrderStatus, PaymentProvider, PaymentStatus } from '../../common/enums';
 import Stripe from 'stripe';
 import { Product } from '../product/entities/product.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';

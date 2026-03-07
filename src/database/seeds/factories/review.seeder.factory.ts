@@ -1,5 +1,5 @@
 import { Faker } from '@faker-js/faker';
-import { Review } from 'src/modules/reviews/entities/review.entity';
+import { Review } from '../../../modules/reviews/entities/review.entity';
 import { setSeederFactory } from 'typeorm-extension';
 
 export const ReviewFactory = setSeederFactory(Review, (faker: Faker) => {

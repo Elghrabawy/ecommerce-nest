@@ -1,5 +1,5 @@
 import { Faker } from '@faker-js/faker';
-import { OrderItem } from 'src/modules/order/entities/order-item.entity';
+import { OrderItem } from '../../../modules/order/entities/order-item.entity';
 import { setSeederFactory } from 'typeorm-extension';
 
 export const OrderItemFactory = setSeederFactory(OrderItem, (faker: Faker) => {

@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { StorageService } from 'src/modules/storage/storage.service';
+import { StorageService } from '../../storage.service';
 import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
 import { randomUUID } from 'crypto';
 import * as streamifier from 'streamifier';

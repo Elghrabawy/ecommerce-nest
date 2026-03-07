@@ -16,7 +16,7 @@ import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 import { User } from '../user/entities/user.entity';
 import AuthRoles from '../auth/decorators/roles.decorator';
-import { UserRole } from 'src/common';
+import { UserRole } from '../../common';
 
 @ApiTags('payments')
 @Controller('payments')

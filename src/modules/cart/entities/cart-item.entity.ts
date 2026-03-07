@@ -1,7 +1,7 @@
-import { BaseEntity } from 'src/common/entities';
+import { BaseEntity } from '../../../common/entities';
 import { Entity, Column, ManyToOne, Unique } from 'typeorm';
 import { Cart } from './cart.entity';
-import { Product } from 'src/modules/product/entities/product.entity';
+import { Product } from '../../product/entities/product.entity';
 import { Index } from 'typeorm';
 import { Exclude } from 'class-transformer';
 

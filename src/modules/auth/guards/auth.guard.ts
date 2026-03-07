@@ -5,8 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { JwtPayload } from 'src/common/interfaces';
-import { CURRENT_USER_KEY } from 'src/common/constants';
+import { JwtPayload } from '../../../common/interfaces';
+import { CURRENT_USER_KEY } from '../../../common/constants';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 
 @Injectable()

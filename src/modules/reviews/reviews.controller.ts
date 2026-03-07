@@ -13,11 +13,11 @@ import {
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto, UpdateReviewDto, ReviewFilterDto } from './dto';
-import { PaginationDto } from 'src/common';
+import { PaginationDto } from '../../common';
 import Auth from '../auth/decorators/auth.decorator';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { User } from '../user/entities/user.entity';
-import { ResponseInterceptor } from 'src/common/interceptors';
+import { ResponseInterceptor } from '../../common/interceptors';
 import { Review } from './entities/review.entity';
 
 @ApiTags('reviews')

@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { registerAs } from '@nestjs/config';
-import { StorageProvider } from 'src/common/enums';
+import { StorageProvider } from '../common/enums';
 import './env.loader';
 
 export interface MinioConfig {

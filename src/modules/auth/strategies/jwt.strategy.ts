@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { type ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from 'src/common/interfaces';
-import jwtConfig from 'src/config/jwt.config';
+import { JwtPayload } from '../../../common/interfaces';
+import jwtConfig from '../../../config/jwt.config';
 
 @Injectable()
 export class JwtStrategy {
