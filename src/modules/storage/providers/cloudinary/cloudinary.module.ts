@@ -3,9 +3,9 @@ import { CloudinaryService } from './cloudinary.service';
 import { v2 as cloudinary } from 'cloudinary';
 import { MulterModule } from '@nestjs/platform-express';
 import { CloudinaryController } from './cloudinary.controller';
-import { AuthModule } from 'src/modules/auth/auth.module';
+import { AuthModule } from '../../../auth/auth.module';
 import { ConfigService } from '@nestjs/config';
-import cloudinaryConfig from 'src/config/cloudinary.config';
+import cloudinaryConfig from '../../../../config/cloudinary.config';
 
 @Module({
   imports: [

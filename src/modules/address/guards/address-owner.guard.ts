@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Request } from 'express';
-import { CURRENT_USER_KEY } from 'src/common/constants';
-import { User } from 'src/modules/user/entities/user.entity';
+import { CURRENT_USER_KEY } from '../../../common/constants';
+import { User } from '../../user/entities/user.entity';
 import { AddressService } from '../address.service';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { BaseEntity } from 'src/common/entities';
+import { BaseEntity } from '../../../common/entities';
 import {
   Entity,
   Column,
@@ -9,7 +9,7 @@ import {
   TreeChildren,
   TreeParent,
 } from 'typeorm';
-import { Product } from 'src/modules/product/entities/product.entity';
+import { Product } from '../../product/entities/product.entity';
 import { Exclude } from 'class-transformer';
 
 @Entity('categories')

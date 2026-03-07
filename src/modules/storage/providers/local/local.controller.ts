@@ -12,12 +12,12 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
-import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
-import { UserRole } from 'src/common/enums';
+import AuthRoles from '../../../auth/decorators/roles.decorator';
+import { UserRole } from '../../../../common/enums';
 import type { Response } from 'express';
 import { LocalStorageService } from './local.service';
-import { FileUploadDto } from 'src/modules/storage/dto/file-upload.dto';
-import { FilesUploadDto } from 'src/modules/storage/dto/files-upload.dto';
+import { FileUploadDto } from '../../dto/file-upload.dto';
+import { FilesUploadDto } from '../../dto/files-upload.dto';
 
 @Controller('storage/local')
 export class LocalStorageController {

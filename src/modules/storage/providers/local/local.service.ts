@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { StorageService } from 'src/modules/storage/storage.service';
+import { StorageService } from '../../storage.service';
 
 @Injectable()
 export class LocalStorageService implements StorageService {

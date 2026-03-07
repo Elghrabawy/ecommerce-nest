@@ -1,10 +1,10 @@
-import { User } from 'src/modules/user/entities/user.entity';
-import { BaseEntity } from 'src/common/entities';
-import { OrderStatus } from 'src/common/enums';
+import { User } from '../../user/entities/user.entity';
+import { BaseEntity } from '../../../common/entities';
+import { OrderStatus } from '../../../common/enums';
 import { Entity, Column, ManyToOne, OneToMany, OneToOne, Index } from 'typeorm';
 import { OrderItem } from './order-item.entity';
-import { Payment } from 'src/modules/payment/entities/payment.entity';
-import { Address } from 'src/modules/address/entities/address.entity';
+import { Payment } from '../../payment/entities/payment.entity';
+import { Address } from '../../address/entities/address.entity';
 
 @Entity('orders')
 // index to optimize queries filtering by status and created_at (for expiration checks)

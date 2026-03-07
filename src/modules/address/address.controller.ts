@@ -18,10 +18,10 @@ import Auth from '../auth/decorators/auth.decorator';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { User } from '../user/entities/user.entity';
 import AuthAddress from './decorators/auth-address.decorator';
-import AuthRoles from 'src/modules/auth/decorators/roles.decorator';
-import { UserRole } from 'src/common/enums';
-import { ResponseInterceptor } from 'src/common/interceptors';
-import { PaginationDto } from 'src/common';
+import AuthRoles from '../auth/decorators/roles.decorator';
+import { UserRole } from '../../common/enums';
+import { ResponseInterceptor } from '../../common/interceptors';
+import { PaginationDto } from '../../common';
 
 @ApiTags('addresses')
 @Controller('addresses')

@@ -4,7 +4,7 @@ import * as Minio from 'minio';
 import { randomUUID } from 'crypto';
 import { StorageService } from '../../storage.service';
 import { MinioConfig } from '../../../../config/minio.config';
-import { StorageProvider } from 'src/common/enums';
+import { StorageProvider } from '../../../../common/enums';
 
 @Injectable()
 export class MinioStorageService implements StorageService {

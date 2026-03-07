@@ -14,7 +14,7 @@ import { AddressService } from '../address/address.service';
 import { User } from '../user/entities/user.entity';
 import { Product } from '../product/entities/product.entity';
 import { OrderItem } from './entities/order-item.entity';
-import { OrderStatus } from 'src/common/enums';
+import { OrderStatus } from '../../common/enums';
 import { Address } from '../address/entities/address.entity';
 import { ConfigService } from '@nestjs/config';
 

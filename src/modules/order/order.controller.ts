@@ -15,7 +15,7 @@ import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { User } from '../user/entities/user.entity';
 import Auth from '../auth/decorators/auth.decorator';
 import AuthRoles from '../auth/decorators/roles.decorator';
-import { UserRole } from 'src/common/enums';
+import { UserRole } from '../../common/enums';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 

@@ -1,17 +1,17 @@
 import { DataSource } from 'typeorm';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
-import { User } from 'src/modules/user/entities/user.entity';
-import { Product } from 'src/modules/product/entities/product.entity';
-import { Category } from 'src/modules/category/entities/category.entity';
-import { Address } from 'src/modules/address/entities/address.entity';
-import { Cart } from 'src/modules/cart/entities/cart.entity';
-import { CartItem } from 'src/modules/cart/entities/cart-item.entity';
-import { Review } from 'src/modules/reviews/entities/review.entity';
-import { Order } from 'src/modules/order/entities/order.entity';
-import { OrderItem } from 'src/modules/order/entities/order-item.entity';
-import { Payment } from 'src/modules/payment/entities/payment.entity';
-import { Wishlist } from 'src/modules/wishlist/entities/wishlist.entity';
-import { UserRole } from 'src/common';
+import { User } from '../../modules/user/entities/user.entity';
+import { Product } from '../../modules/product/entities/product.entity';
+import { Category } from '../../modules/category/entities/category.entity';
+import { Address } from '../../modules/address/entities/address.entity';
+import { Cart } from '../../modules/cart/entities/cart.entity';
+import { CartItem } from '../../modules/cart/entities/cart-item.entity';
+import { Review } from '../../modules/reviews/entities/review.entity';
+import { Order } from '../../modules/order/entities/order.entity';
+import { OrderItem } from '../../modules/order/entities/order-item.entity';
+import { Payment } from '../../modules/payment/entities/payment.entity';
+import { Wishlist } from '../../modules/wishlist/entities/wishlist.entity';
+import { UserRole } from '../../common';
 
 export class MainSeeder implements Seeder {
   private async createCategories(dataSource: DataSource): Promise<Category[]> {

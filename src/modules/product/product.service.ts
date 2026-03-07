@@ -11,9 +11,9 @@ import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductFilterDto } from './dto/product-filter.dto';
 import { SelectQueryBuilder } from 'typeorm/browser';
-import { PaginationDto } from 'src/common/dto';
+import { PaginationDto } from '../../common/dto';
 import { generateSlug } from './../../common/utils';
-import { PaginationHelper } from 'src/common/utils';
+import { PaginationHelper } from '../../common/utils';
 
 @Injectable()
 export class ProductService {

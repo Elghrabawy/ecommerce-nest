@@ -1,5 +1,5 @@
-import { User } from 'src/modules/user/entities/user.entity';
-import { BaseEntity } from 'src/common/entities';
+import { User } from '../../user/entities/user.entity';
+import { BaseEntity } from '../../../common/entities';
 import { Entity, OneToOne, OneToMany, JoinColumn, Column } from 'typeorm';
 import { CartItem } from './cart-item.entity';
 import { Exclude } from 'class-transformer';

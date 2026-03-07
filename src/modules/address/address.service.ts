@@ -4,7 +4,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Address } from './entities/address.entity';
 import { CreateAddressDto, UpdateAddressDto } from './dto';
 import { User } from '../user/entities/user.entity';
-import { PaginationDto, PaginationHelper } from 'src/common';
+import { PaginationDto, PaginationHelper } from '../../common';
 
 @Injectable()
 export class AddressService {

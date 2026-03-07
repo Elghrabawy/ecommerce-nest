@@ -3,18 +3,6 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
-import * as tsConfigPaths from 'tsconfig-paths';
-import * as path from 'path';
-
-// Fix Vercel not resolving 'src/' paths correctly since Node doesn't do this natively.
-if (process.env.VERCEL) {
-  const tsConfig = require('../tsconfig.json');
-  tsConfigPaths.register({
-    baseUrl: __dirname,
-    paths: tsConfig.compilerOptions.paths || { "src/*": ["./*"] },
-  });
-}
-
 let cachedServer: any;
 
 async function bootstrap() {

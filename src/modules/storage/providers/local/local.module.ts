@@ -1,6 +1,6 @@
 import { BadRequestException, Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
-import { AuthModule } from 'src/modules/auth/auth.module';
+import { AuthModule } from '../../../auth/auth.module';
 import { LocalStorageService } from './local.service';
 import { LocalStorageController } from './local.controller';
 

@@ -1,11 +1,11 @@
 import { Faker } from '@faker-js/faker';
-import { Payment } from 'src/modules/payment/entities/payment.entity';
+import { Payment } from '../../../modules/payment/entities/payment.entity';
 import { setSeederFactory } from 'typeorm-extension';
 import {
   PaymentStatus,
   PaymentMethod,
   PaymentProvider,
-} from 'src/common/enums';
+} from '../../../common/enums';
 
 export const PaymentFactory = setSeederFactory(Payment, (faker: Faker) => {
   const payment = new Payment();
