@@ -1,8 +1,9 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class MailService {
+  private readonly logger = new Logger(MailService.name);
   constructor(private readonly mailer: MailerService) {}
   async sendMail(to: string, subject: string, body: string) {
     await this.mailer.sendMail({
@@ -59,5 +60,48 @@ export class MailService {
         reason,
       },
     });
+  }
+
+  async getInboxMessages(): Promise<any[]> {
+    const token = process.env.MAILTRAP_API_TOKEN!;
+    const inboxId = process.env.MAILTRAP_INBOX_ID;
+    const accountId = process.env.MAILTRAP_ACCOUNT_ID;
+    this.logger.debug(
+      `MAILTRAP_API_TOKEN set: ${!!token}, length: ${token?.length}, INBOX_ID: ${inboxId}`,
+    );
+    const headers: HeadersInit = { 'Api-Token': token };
+    const response = await fetch(
+      `https://mailtrap.io/api/accounts/${accountId}/inboxes/${inboxId}/messages`,
+      { headers },
+    );
+    if (!response.ok) throw new Error(`Mailtrap API error: ${response.status}`);
+    return response.json();
+  }
+
+  async getMessageHtml(messageId: string): Promise<string> {
+    const token = process.env.MAILTRAP_API_TOKEN!;
+    const inboxId = process.env.MAILTRAP_INBOX_ID;
+    const accountId = process.env.MAILTRAP_ACCOUNT_ID;
+
+    const headers: HeadersInit = { 'Api-Token': token };
+    const response = await fetch(
+      `https://mailtrap.io/api/accounts/${accountId}/inboxes/${inboxId}/messages/${messageId}/body.html`,
+      { headers },
+    );
+    if (!response.ok) throw new Error(`Mailtrap API error: ${response.status}`);
+    return response.text();
+  }
+
+  async deleteMessage(messageId: string): Promise<void> {
+    const token = process.env.MAILTRAP_API_TOKEN!;
+    const inboxId = process.env.MAILTRAP_INBOX_ID;
+
+    const accountId = process.env.MAILTRAP_ACCOUNT_ID;
+
+    const headers: HeadersInit = { 'Api-Token': token };
+    await fetch(
+      `https://mailtrap.io/api/accounts/${accountId}/inboxes/${inboxId}/messages/${messageId}`,
+      { method: 'DELETE', headers },
+    );
   }
 }

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mail Inbox</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f2f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      flex-shrink: 0;
+    }
+    .header h1 { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .btn {
+      padding: 7px 16px; border-radius: 8px; border: none; cursor: pointer;
+      font-family: inherit; font-size: 13px; font-weight: 500; transition: all .15s;
+    }
+    .btn-light { background: rgba(255,255,255,0.2); color: white; }
+    .btn-light:hover { background: rgba(255,255,255,0.35); }
+    .badge {
+      background: rgba(255,255,255,0.3); color: white;
+      border-radius: 20px; padding: 2px 10px; font-size: 12px;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 340px;
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: #6b7280;
+    }
+    .message-list {
+      overflow-y: auto;
+      flex: 1;
+    }
+    .message-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+      transition: background .12s;
+      position: relative;
+    }
+    .message-item:hover { background: #f9fafb; }
+    .message-item.active { background: #ede9fe; border-left: 3px solid #764ba2; }
+    .message-item .msg-from {
+      font-size: 13px; font-weight: 600; color: #111827;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .message-item .msg-from .msg-time {
+      font-size: 11px; font-weight: 400; color: #9ca3af; flex-shrink: 0; margin-left: 8px;
+    }
+    .message-item .msg-subject {
+      font-size: 12.5px; color: #374151; margin-top: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .message-item .msg-to {
+      font-size: 11px; color: #9ca3af; margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .delete-btn {
+      position: absolute; right: 10px; bottom: 10px;
+      background: none; border: none; cursor: pointer;
+      color: #d1d5db; font-size: 14px; padding: 2px 5px;
+      border-radius: 4px; opacity: 0; transition: opacity .15s, color .15s;
+    }
+    .message-item:hover .delete-btn { opacity: 1; }
+    .delete-btn:hover { color: #ef4444; }
+
+    /* ── Preview Pane ── */
+    .preview {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #fff;
+    }
+    .preview-empty {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; color: #9ca3af;
+      gap: 12px;
+    }
+    .preview-empty .icon { font-size: 48px; }
+    .preview-empty p { font-size: 14px; }
+
+    .preview-header {
+      padding: 20px 28px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      flex-shrink: 0;
+    }
+    .preview-header h2 { font-size: 17px; font-weight: 600; color: #111827; margin-bottom: 10px; }
+    .meta-row { display: flex; gap: 6px; font-size: 12.5px; color: #6b7280; margin-top: 4px; }
+    .meta-row strong { color: #374151; }
+
+    .preview-body {
+      flex: 1;
+      overflow: hidden;
+    }
+    .preview-body iframe {
+      width: 100%; height: 100%; border: none;
+    }
+
+    /* ── States ── */
+    .loading {
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px; color: #9ca3af; font-size: 13px; gap: 10px;
+    }
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid #e5e7eb;
+      border-top-color: #764ba2; border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-list {
+      padding: 40px 20px; text-align: center; color: #9ca3af; font-size: 13px;
+    }
+
+    .error-banner {
+      background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
+      padding: 10px 16px; font-size: 13px; border-radius: 8px; margin: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>✉️ Mail Inbox <span class="badge" id="count-badge">0</span></h1>
+    <div class="header-actions">
+      <span style="font-size:13px;opacity:.8">Mailtrap Sandbox</span>
+      <button class="btn btn-light" onclick="loadMessages()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <span id="sidebar-label">Loading…</span>
+      </div>
+      <div class="message-list" id="message-list">
+        <div class="loading"><div class="spinner"></div> Loading messages…</div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview" id="preview">
+      <div class="preview-empty">
+        <div class="icon">📭</div>
+        <p>Select a message to preview it</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '';
+    let messages = [];
+    let activeId = null;
+
+    async function loadMessages() {
+      const list = document.getElementById('message-list');
+      const label = document.getElementById('sidebar-label');
+      list.innerHTML = '<div class="loading"><div class="spinner"></div> Loading messages…</div>';
+      label.textContent = 'Loading…';
+
+      try {
+        const res = await fetch(`${API_BASE}/mail/inbox`);
+        if (!res.ok) throw new Error(`Server responded ${res.status}`);
+        messages = await res.json();
+        renderList(messages);
+      } catch (err) {
+        list.innerHTML = `<div class="error-banner">Failed to load: ${err.message}</div>`;
+        label.textContent = 'Error';
+      }
+    }
+
+    function renderList(msgs) {
+      const list = document.getElementById('message-list');
+      const badge = document.getElementById('count-badge');
+      const label = document.getElementById('sidebar-label');
+
+      badge.textContent = msgs.length;
+      label.textContent = `${msgs.length} message${msgs.length !== 1 ? 's' : ''}`;
+
+      if (msgs.length === 0) {
+        list.innerHTML = '<div class="empty-list">📬 No messages yet</div>';
+        return;
+      }
+
+      list.innerHTML = msgs.map(m => `
+        <div class="message-item ${m.id === activeId ? 'active' : ''}" onclick="openMessage(${m.id})" id="item-${m.id}">
+          <div class="msg-from">
+            <span style="overflow:hidden;text-overflow:ellipsis">${escHtml(m.from_email || '—')}</span>
+            <span class="msg-time">${formatDate(m.created_at || m.sent_at)}</span>
+          </div>
+          <div class="msg-subject">${escHtml(m.subject || '(no subject)')}</div>
+          <div class="msg-to">To: ${escHtml(m.to_email || '—')}</div>
+          <button class="delete-btn" title="Delete" onclick="deleteMessage(event, ${m.id})">🗑</button>
+        </div>
+      `).join('');
+    }
+
+    async function openMessage(id) {
+      activeId = id;
+      document.querySelectorAll('.message-item').forEach(el => el.classList.remove('active'));
+      const item = document.getElementById(`item-${id}`);
+      if (item) item.classList.add('active');
+
+      const msg = messages.find(m => m.id === id);
+      const preview = document.getElementById('preview');
+
+      preview.innerHTML = `
+        <div class="preview-header">
+          <h2>${escHtml(msg?.subject || '(no subject)')}</h2>
+          <div class="meta-row"><strong>From:</strong> ${escHtml(msg?.from_email || '—')}</div>
+          <div class="meta-row"><strong>To:</strong> ${escHtml(msg?.to_email || '—')}</div>
+          <div class="meta-row"><strong>Date:</strong> ${formatDateFull(msg?.created_at || msg?.sent_at)}</div>
+        </div>
+        <div class="preview-body">
+          <div class="loading"><div class="spinner"></div> Loading body…</div>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(`${API_BASE}/mail/inbox/${id}/body`);
+        if (!res.ok) throw new Error(`${res.status}`);
+        const html = await res.text();
+        const body = preview.querySelector('.preview-body');
+        const iframe = document.createElement('iframe');
+        iframe.sandbox = 'allow-same-origin';
+        body.innerHTML = '';
+        body.appendChild(iframe);
+        iframe.contentDocument.open();
+        iframe.contentDocument.write(html || '<p style="padding:20px;color:#9ca3af">No HTML content</p>');
+        iframe.contentDocument.close();
+      } catch (err) {
+        preview.querySelector('.preview-body').innerHTML =
+          `<div class="error-banner">Failed to load body: ${err.message}</div>`;
+      }
+    }
+
+    async function deleteMessage(event, id) {
+      event.stopPropagation();
+      if (!confirm('Delete this message?')) return;
+      try {
+        await fetch(`${API_BASE}/mail/inbox/${id}`, { method: 'DELETE' });
+        if (activeId === id) {
+          activeId = null;
+          document.getElementById('preview').innerHTML = `
+            <div class="preview-empty"><div class="icon">📭</div><p>Select a message to preview it</p></div>`;
+        }
+        await loadMessages();
+      } catch (err) {
+        alert('Delete failed: ' + err.message);
+      }
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      const now = new Date();
+      if (d.toDateString() === now.toDateString()) {
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    function formatDateFull(dateStr) {
+      if (!dateStr) return '—';
+      return new Date(dateStr).toLocaleString();
+    }
+
+    // Initial load
+    loadMessages();
+  </script>
+</body>
+</html>
