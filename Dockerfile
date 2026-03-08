@@ -31,7 +31,7 @@ COPY --from=builder /app/dist ./dist
 
 # Copy startup script
 COPY entrypoint.sh ./
-RUN chmod +x entrypoint.sh
+RUN sed -i 's/\r$//' entrypoint.sh && chmod +x entrypoint.sh
 
 # Expose the application port
 EXPOSE 3500
