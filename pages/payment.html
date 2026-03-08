@@ -4,140 +4,281 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment Test - Stripe</title>
+  <title>Complete Payment</title>
 
   <script src="https://js.stripe.com/v3/"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f7fafc;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      padding: 24px;
     }
 
-    form {
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
       width: 100%;
-      max-width: 400px;
+      max-width: 460px;
+      overflow: hidden;
     }
 
-    h2 {
+    .card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 28px 32px;
       text-align: center;
-      color: #333;
-      margin-bottom: 20px;
+      color: white;
     }
 
-    button {
-      background-color: #5469d4;
+    .card-header .lock-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .card-header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+
+    .card-header p {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .card-body {
+      padding: 28px 32px 32px;
+    }
+
+    #param-hint {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #78350f;
+      line-height: 1.6;
+    }
+
+    #param-hint .hint-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    #param-hint strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #92400e;
+      font-size: 13px;
+    }
+
+    #param-hint code {
+      display: inline-block;
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      word-break: break-all;
+      margin-top: 4px;
+    }
+
+    #payment-element {
+      margin-bottom: 24px;
+    }
+
+    #submit {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      padding: 12px;
+      padding: 14px;
       width: 100%;
-      border-radius: 4px;
-      margin-top: 20px;
-      font-size: 16px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: opacity 0.2s, transform 0.1s;
+      letter-spacing: 0.2px;
     }
 
-    button:hover {
-      background-color: #4354a8;
+    #submit:hover:not(:disabled) {
+      opacity: 0.92;
+      transform: translateY(-1px);
     }
 
-    button:disabled {
-      background-color: #cccccc;
+    #submit:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    #submit:disabled {
+      opacity: 0.5;
       cursor: not-allowed;
     }
 
     #error-message {
-      color: #df1b41;
-      margin-top: 15px;
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
       text-align: center;
-      font-size: 14px;
+      display: none;
+    }
+
+    #error-message.error {
+      display: block;
+      background: #fff1f2;
+      border: 1px solid #fda4af;
+      color: #be123c;
+    }
+
+    #error-message.success {
+      display: block;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      color: #15803d;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #f1f5f9;
+      margin: 0 0 24px;
+    }
+
+    .secure-badge {
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 16px;
+    }
+
+    .secure-badge span {
+      margin-right: 4px;
     }
   </style>
 </head>
 
 <body>
 
-  <form id="payment-form">
-    <h2>Complete Payment</h2>
+  <div class="card">
+    <div class="card-header">
+      <div class="lock-icon">🔒</div>
+      <h1>Complete Payment</h1>
+      <p>Your payment is secured and encrypted</p>
+    </div>
 
-    <div id="payment-element"></div>
+    <div class="card-body">
+      <div id="param-hint">
+        <span class="hint-icon">⚠️</span>
+        <div>
+          <strong>Required URL parameter</strong>
+          Append to the page URL before use:<br>
+          <code>?clientSecret=YOUR_CLIENT_SECRET</code>
+        </div>
+      </div>
 
-    <button id="submit">Pay Now</button>
-    <div id="error-message"></div>
-  </form>
+      <form id="payment-form">
+        <hr class="divider">
+        <div id="payment-element"></div>
+
+        <button id="submit" type="submit">Pay Now</button>
+        <div id="error-message"></div>
+
+        <p class="secure-badge">
+          <span>🔐</span> Secured by <strong>Stripe</strong>
+        </p>
+      </form>
+    </div>
+  </div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const publishableKey = urlParams.get('pk');
     const clientSecret = urlParams.get('clientSecret');
 
-    // Validate required parameters
-    const errorMessage = document.getElementById('error-message');
+    const errorEl = document.getElementById('error-message');
     const submitBtn = document.getElementById('submit');
     const paymentElementDiv = document.getElementById('payment-element');
+    const paramHint = document.getElementById('param-hint');
+    const divider = document.querySelector('.divider');
 
-    if (!publishableKey || !clientSecret) {
-      errorMessage.textContent = 'Payment information is incomplete. Please try again.';
-      errorMessage.style.display = 'block';
-      submitBtn.disabled = true;
-      paymentElementDiv.innerHTML = '<p style="color: #df1b41; text-align: center;">Missing payment parameters (pk and clientSecret)</p>';
-    } else {
-      const stripe = Stripe(publishableKey);
-
-      const elements = stripe.elements({ clientSecret });
-      const paymentElement = elements.create('payment');
-
-      // Mount payment element
-      paymentElement.mount('#payment-element');
-
-      // Handle form submission
-      const form = document.getElementById('payment-form');
-
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        // Disable button and change text during processing
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Processing...';
-        errorMessage.textContent = '';
-
-        // Confirm payment
-        const { error } = await stripe.confirmPayment({
-          elements,
-          confirmParams: {
-            // Redirect URL after successful payment
-            return_url: window.location.origin + window.location.pathname + '?success=true',
-          },
-        });
-
-        // Handle errors (e.g., declined card)
-        if (error) {
-          errorMessage.textContent = error.message;
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Pay Now';
-        }
-      });
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.className = 'error';
     }
 
-    // Check for success parameter to show success message
+    function showSuccess(msg) {
+      errorEl.textContent = msg;
+      errorEl.className = 'success';
+    }
+
     if (urlParams.get('success') === 'true') {
-      errorMessage.style.color = '#22c55e';
-      errorMessage.textContent = 'Payment successful! ✓';
+      paramHint.style.display = 'none';
+      divider.style.display = 'none';
       submitBtn.style.display = 'none';
-      paymentElementDiv.innerHTML = '<p style="color: #22c55e; text-align: center; font-size: 18px;">✓ Payment completed successfully</p>';
+      paymentElementDiv.innerHTML = '<p style="text-align:center;font-size:40px;margin-bottom:8px">✅</p>';
+      showSuccess('Payment completed successfully!');
+    } else if (!clientSecret) {
+      submitBtn.disabled = true;
+    } else {
+      paramHint.style.display = 'none';
+      divider.style.display = 'none';
+      submitBtn.disabled = true;
+
+      fetch('/api/stripe-config')
+        .then((res) => {
+          if (!res.ok) throw new Error('Failed to load payment configuration');
+          return res.json();
+        })
+        .then(({ publishableKey }) => {
+          if (!publishableKey) throw new Error('Stripe public key is not configured on the server');
+
+          const stripe = Stripe(publishableKey);
+          const elements = stripe.elements({ clientSecret });
+          const paymentElement = elements.create('payment');
+          paymentElement.mount('#payment-element');
+          submitBtn.disabled = false;
+
+          document.getElementById('payment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing…';
+            errorEl.className = '';
+
+            const { error } = await stripe.confirmPayment({
+              elements,
+              confirmParams: {
+                return_url: window.location.origin + window.location.pathname + '?' + urlParams.toString() + '&success=true',
+              },
+            });
+
+            if (error) {
+              showError(error.message);
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Pay Now';
+            }
+          });
+        })
+        .catch((err) => {
+          showError(err.message || 'Failed to initialize payment.');
+          submitBtn.disabled = true;
+        });
     }
   </script>
 
 </body>
-
 </html>

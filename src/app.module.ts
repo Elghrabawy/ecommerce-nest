@@ -1,4 +1,6 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -20,6 +22,7 @@ import dbConfig from './config/db.config';
 import minioConfig from './config/minio.config';
 import jwtConfig from './config/jwt.config';
 import refreshJwtConfig from './config/refresh-jwt.config';
+import stripeConfig from './config/stripe.config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import envFile from './config/env.loader';
@@ -38,7 +41,7 @@ import envFile from './config/env.loader';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: envFile,
-      load: [dbConfig, minioConfig, jwtConfig, refreshJwtConfig],
+      load: [dbConfig, minioConfig, jwtConfig, refreshJwtConfig, stripeConfig],
     }),
 
     TypeOrmModule.forRootAsync({
@@ -49,6 +52,11 @@ import envFile from './config/env.loader';
     AddressModule,
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'pages'),
+      serveRoot: '/',
+      exclude: ['/api/*'],
+    }),
   ],
   controllers: [AppController],
   providers: [
