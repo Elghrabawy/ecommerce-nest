@@ -15,12 +15,6 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Build db migrations 
-RUN migration:run
-
-# run seeder
-RUN seed:run
-
 # Stage 2: Production
 FROM node:20-alpine AS production
 
@@ -35,8 +29,12 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy startup script
+COPY entrypoint.sh ./
+RUN chmod +x entrypoint.sh
+
 # Expose the application port
 EXPOSE 3500
 
-# Start the application
-CMD ["node", "dist/main"]
+# Run migrations then start the application
+CMD ["./entrypoint.sh"]
