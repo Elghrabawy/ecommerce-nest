@@ -210,12 +210,12 @@ export class MainSeeder implements Seeder {
     console.log('🛍️ Creating cart items...');
     for (const cart of carts) {
       const itemCount = Math.floor(Math.random() * 6); // 0-5 items
-      for (let i = 0; i < itemCount; i++) {
-        const randomProduct =
-          products[Math.floor(Math.random() * products.length)];
+      const shuffled = [...products].sort(() => 0.5 - Math.random());
+      const selectedProducts = shuffled.slice(0, itemCount);
+      for (const product of selectedProducts) {
         await factoryManager.get(CartItem).save({
           cart,
-          product: randomProduct,
+          product,
         });
       }
     }
