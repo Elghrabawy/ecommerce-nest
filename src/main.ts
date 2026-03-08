@@ -10,7 +10,12 @@ async function bootstrap() {
 
   const swaggerDocument = new DocumentBuilder()
     .setTitle('E-commerce API')
-    .setDescription('API documentation for the E-commerce application')
+    .setDescription(
+      `**API documentation for the E-commerce application**\n\n` +
+        `**UI Test Pages:**&nbsp;&nbsp;` +
+        `[Payment Page](/payment.html)&nbsp;&nbsp;|&nbsp;&nbsp;` +
+        `[Mail Inbox](/mail-inbox.html)`,
+    )
     .setContact(
       'Borhom',
       'https://borhom.netlify.app/',
