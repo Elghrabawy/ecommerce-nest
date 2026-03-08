@@ -12,17 +12,21 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service';
-import { CreateReviewDto, UpdateReviewDto, ReviewFilterDto } from './dto';
+import {
+  CreateReviewDto,
+  UpdateReviewDto,
+  ReviewFilterDto,
+  ReviewResponseDto,
+} from './dto';
 import { PaginationDto } from '../../common';
 import Auth from '../auth/decorators/auth.decorator';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { User } from '../user/entities/user.entity';
 import { ResponseInterceptor } from '../../common/interceptors';
-import { Review } from './entities/review.entity';
 
 @ApiTags('Reviews')
 @Controller('reviews')
-@UseInterceptors(ResponseInterceptor<Review>)
+@UseInterceptors(ResponseInterceptor<ReviewResponseDto>)
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
@@ -31,13 +35,15 @@ export class ReviewsController {
   async getReviews(
     @Query() pagination: PaginationDto,
     @Query() filters?: ReviewFilterDto,
-  ) {
+  ): Promise<ReviewResponseDto[]> {
     return await this.reviewsService.getAllReviews(pagination, filters);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get review by ID' })
-  async getReviewById(@Param('id', ParseIntPipe) id: number) {
+  async getReviewById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ReviewResponseDto> {
     return await this.reviewsService.getReviewById(id);
   }
 
@@ -47,7 +53,7 @@ export class ReviewsController {
   async createReview(
     @Body() createReviewDto: CreateReviewDto,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<ReviewResponseDto> {
     return await this.reviewsService.createReview(createReviewDto, user.id);
   }
 
@@ -58,7 +64,7 @@ export class ReviewsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateReviewDto: UpdateReviewDto,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<ReviewResponseDto> {
     return await this.reviewsService.updateReview(id, updateReviewDto, user.id);
   }
 
@@ -68,7 +74,7 @@ export class ReviewsController {
   async deleteReview(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<{ message: string }> {
     await this.reviewsService.deleteReview(id, user.id);
     return { message: 'Review deleted successfully' };
   }
@@ -79,7 +85,7 @@ export class ReviewsController {
     @Param('productId', ParseIntPipe) productId: number,
     @Query() pagination: PaginationDto,
     @Query() filters?: ReviewFilterDto,
-  ) {
+  ): Promise<ReviewResponseDto[]> {
     return await this.reviewsService.getReviewsByProductId(
       productId,
       pagination,
@@ -109,7 +115,7 @@ export class ReviewsController {
   async getReviewsByUserId(
     @Param('userId', ParseIntPipe) userId: number,
     @Query() pagination: PaginationDto,
-  ) {
+  ): Promise<ReviewResponseDto[]> {
     return await this.reviewsService.getReviewsByUserId(userId, pagination);
   }
 }
