@@ -125,22 +125,26 @@ The API will be available at `http://localhost:3500`.
 | `DB_USERNAME` | PostgreSQL username |
 | `DB_PASSWORD` | PostgreSQL password |
 | `DB_NAME` | Database name |
+| `DB_SSL` | Enable SSL for DB connection (`true` \| `false`) |
 | `JWT_SECRET` | Secret for access tokens |
-| `JWT_EXPIRES_IN` | Access token expiry (e.g. `1d`) |
+| `JWT_EXPIRES_IN` | Access token expiry (e.g. `15m`) |
 | `REFRESH_JWT_SECRET` | Secret for refresh tokens |
-| `REFRESH_JWT_EXPIRES_IN` | Refresh token expiry (e.g. `30d`) |
+| `REFRESH_JWT_EXPIRES_IN` | Refresh token expiry (e.g. `7d`) |
 | `SMTP_HOST` | SMTP host (Mailtrap: `sandbox.smtp.mailtrap.io`) |
 | `SMTP_PORT` | SMTP port (Mailtrap: `587`) |
 | `SMTP_USERNAME` | SMTP username |
 | `SMTP_PASSWORD` | SMTP password |
 | `MAILTRAP_INBOX_ID` | Mailtrap inbox ID (for mail viewer) |
+| `MAILTRAP_ACCOUNT_ID` | Mailtrap account ID (for mail viewer) |
 | `MAILTRAP_API_TOKEN` | Mailtrap API token (for mail viewer) |
-| `UPLOAD_PROVIDER` | `local` \| `minio` \| `cloudinary` |
+| `STORAGE_PROVIDER` | `local` \| `minio` \| `cloudinary` |
 | `MINIO_ENDPOINT` | MinIO host |
 | `MINIO_PORT` | MinIO port (default: `9000`) |
+| `MINIO_USE_SSL` | Enable SSL for MinIO (`true` \| `false`) |
 | `MINIO_ACCESS_KEY` | MinIO access key |
 | `MINIO_SECRET_KEY` | MinIO secret key |
 | `MINIO_BUCKET_NAME` | MinIO bucket name |
+| `MINIO_PUBLIC_URL` | Publicly accessible MinIO base URL |
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret |
