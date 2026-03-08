@@ -10,7 +10,12 @@ async function bootstrap() {
 
   const swaggerDocument = new DocumentBuilder()
     .setTitle('E-commerce API')
-    .setVersion('1.0')
+    .setDescription('API documentation for the E-commerce application')
+    .setContact(
+      'Borhom',
+      'https://borhom.netlify.app/',
+      'ibrahim.alghrbawy@gmail.com',
+    )
     .addBearerAuth(
       {
         type: 'http',
