@@ -49,6 +49,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: ecommerce_nestjs
+    
     ports:
       - "5432:5432"
     volumes:
@@ -68,12 +69,18 @@ services:
       dockerfile: Dockerfile
     container_name: ecommerce-app
     ports:
-      - "3000:3000"
+      - "3500:3500"
     env_file:
       - .env.development
     environment:
       # Override for Docker networking
+      DB_PORT: 5432
       DB_HOST: postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: 123
+      DB_NAME: ecommerce_nestjs
+    
+
       MINIO_ENDPOINT: minio
       NODE_ENV: production
     depends_on:

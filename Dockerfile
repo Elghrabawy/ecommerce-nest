@@ -15,6 +15,12 @@ COPY . .
 # Build the application
 RUN npm run build
 
+# Build db migrations 
+RUN migration:run
+
+# run seeder
+RUN seed:run
+
 # Stage 2: Production
 FROM node:20-alpine AS production
 
@@ -30,7 +36,7 @@ RUN npm ci --only=production && npm cache clean --force
 COPY --from=builder /app/dist ./dist
 
 # Expose the application port
-EXPOSE 3000
+EXPOSE 3500
 
 # Start the application
 CMD ["node", "dist/main"]
