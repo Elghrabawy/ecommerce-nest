@@ -3,12 +3,6 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export abstract class StorageService {
   /**
-   * function for storing file to the storage provider
-   * @param file file for uploading
-   */
-  abstract storeFile(file: Express.Multer.File): Promise<void>;
-
-  /**
    * function for uploading file to the storage provider
    * @param file file to upload
    * @retruns uploaded file information
@@ -30,5 +24,10 @@ export abstract class StorageService {
     }[]
   >;
 
-  abstract deleteFile(filename: string): Promise<any>;
+  /**
+   * function for deleting file from the storage provider
+   * @param filename name of the file to delete
+   * @returns result of the delete operation
+   */
+  abstract deleteFile(url: string): Promise<any>;
 }

@@ -32,6 +32,6 @@ import cloudinaryConfig from '../../../../config/cloudinary.config';
     },
   ],
   controllers: [CloudinaryController],
-  exports: [CloudinaryService],
+  exports: [CloudinaryService, 'CLOUDINARY'],
 })
 export class CloudinaryModule {}

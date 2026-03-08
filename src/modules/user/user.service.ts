@@ -194,7 +194,7 @@ export class UserService {
         );
       }
 
-      const filename = user.avatar_url.split('/').pop();
+      const filename = user.avatar_url;
       this.logger.log(`Attempting to delete file ${filename} from storage`);
       if (filename) {
         try {

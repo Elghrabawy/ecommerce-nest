@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import { StorageService } from '../../storage.service';
 import { MinioConfig } from '../../../../config/minio.config';
 import { StorageProvider } from '../../../../common/enums';
+import { DeleteFileResponseDto } from '../../dto/delete-file-response.dto';
 
 @Injectable()
 export class MinioStorageService implements StorageService {
@@ -12,6 +13,7 @@ export class MinioStorageService implements StorageService {
   private readonly minioClient: Minio.Client;
   private readonly bucketName: string;
   private readonly minioConfig: MinioConfig;
+  private readonly baseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
     this.minioConfig = this.configService.get<MinioConfig>(
@@ -27,6 +29,8 @@ export class MinioStorageService implements StorageService {
     });
 
     this.bucketName = this.minioConfig.bucketName;
+
+    this.baseUrl = this.getPublicUrl('');
   }
 
   async storeFile(file: Express.Multer.File): Promise<void> {
@@ -91,16 +95,24 @@ export class MinioStorageService implements StorageService {
     return Promise.all(uploadPromises);
   }
 
-  async deleteFile(filename: string): Promise<any> {
+  async deleteFile(url: string): Promise<DeleteFileResponseDto> {
+    this.logger.log(`Attempting to delete file: ${url}`);
+
+    const objectName = this.extractFileName(url);
     try {
-      await this.minioClient.removeObject(this.bucketName, filename);
-      this.logger.log(`File ${filename} deleted successfully`);
+      await this.minioClient.removeObject(this.bucketName, objectName);
+      this.logger.log(`File ${url} deleted successfully`);
       return {
-        success: true,
-        message: `File ${filename} deleted successfully`,
+        message: `File ${url} deleted successfully`,
+        url,
+        provider: StorageProvider.MINIO,
+        metadata: {
+          objectName,
+          bucketName: this.bucketName,
+        },
       };
     } catch (error) {
-      this.logger.error(`Error deleting file ${filename}:`, error);
+      this.logger.error(`Error deleting file ${url}:`, error);
       throw error;
     }
   }
@@ -119,5 +131,17 @@ export class MinioStorageService implements StorageService {
         : `:${this.minioConfig.port}`;
 
     return `${protocol}://${this.minioConfig.endPoint}${port}/${this.bucketName}/${filename}`;
+  }
+
+  private extractFileName(url: string): string {
+    if (!url.startsWith(this.baseUrl)) {
+      throw new Error(
+        `URL ${url} does not match expected base URL ${this.baseUrl}`,
+      );
+    }
+    const urlParts = url.replace(this.baseUrl, '').split('/').filter(Boolean);
+    const filename = urlParts[urlParts.length - 1];
+
+    return filename;
   }
 }

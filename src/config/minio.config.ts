@@ -16,13 +16,13 @@ export interface MinioConfig {
 const config = registerAs(
   StorageProvider.MINIO,
   (): MinioConfig => ({
-    endPoint: process.env.MINIO_ENDPOINT || 'localhost',
-    port: parseInt(process.env.MINIO_PORT!) || 9000,
-    useSSL: process.env.MINIO_USE_SSL === 'true' || false,
-    accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-    secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin123',
-    bucketName: process.env.MINIO_BUCKET_NAME || 'uploads',
-    region: process.env.MINIO_REGION || 'us-east-1',
+    endPoint: process.env.MINIO_ENDPOINT!,
+    port: parseInt(process.env.MINIO_PORT!),
+    useSSL: process.env.MINIO_USE_SSL === 'true',
+    accessKey: process.env.MINIO_ACCESS_KEY!,
+    secretKey: process.env.MINIO_SECRET_KEY!,
+    bucketName: process.env.MINIO_BUCKET_NAME!,
+    region: process.env.MINIO_REGION!,
   }),
 );
 
