@@ -9,7 +9,12 @@ import { Repository } from 'typeorm';
 import { Wishlist } from './entities/wishlist.entity';
 import { Product } from '../product/entities/product.entity';
 import { User } from '../user/entities/user.entity';
-import { WishlistCheckDto, WishlistCountDto, WishlistProductResponseDto, WishlistResponseDto } from './dto';
+import {
+  WishlistCheckDto,
+  WishlistCountDto,
+  WishlistProductResponseDto,
+  WishlistResponseDto,
+} from './dto';
 
 @Injectable()
 export class WishlistService {
@@ -234,7 +239,6 @@ export class WishlistService {
   }
 
   /**
-   *
    * Get wishlist products with full details
    * @param userId - ID of the user
    * @returns Array of products in the user's wishlist with full details
