@@ -48,7 +48,7 @@ Spins up PostgreSQL, MinIO, and the app in one command. **Migrations and seeds r
 **1. Create your environment file:**
 
 ```bash
-cp .env.development
+cp .env.example .env.development
 ```
 
 Fill in the required secrets (JWT, Stripe, Mailtrap) in `.env.development`. DB and MinIO values are pre-configured for Docker.
@@ -89,7 +89,7 @@ npm install
 **2. Set up environment:**
 
 ```bash
-cp .env.development
+cp .env.example .env.development
 ```
 
 Edit `.env.development` with your local PostgreSQL credentials and other secrets.
