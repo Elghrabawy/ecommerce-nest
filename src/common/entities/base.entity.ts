@@ -11,12 +11,12 @@ export abstract class BaseEntity {
   id: number;
 
   @Exclude()
-  @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
+  @CreateDateColumn({ type: 'timestamptz', default: () => CURRENT_TIMESTAMP })
   created_at: Date;
 
   @Exclude()
   @CreateDateColumn({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => CURRENT_TIMESTAMP,
     onUpdate: CURRENT_TIMESTAMP,
   })
