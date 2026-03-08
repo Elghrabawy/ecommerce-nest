@@ -16,7 +16,7 @@ export interface MinioConfig {
 const config = registerAs(
   StorageProvider.MINIO,
   (): MinioConfig => ({
-    endPoint: process.env.MINIO_ENDPOINT!,
+    endPoint: process.env.MINIO_ENDPOINT || 'localhost',
     port: parseInt(process.env.MINIO_PORT!),
     useSSL: process.env.MINIO_USE_SSL === 'true',
     accessKey: process.env.MINIO_ACCESS_KEY!,

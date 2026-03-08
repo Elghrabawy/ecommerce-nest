@@ -20,6 +20,17 @@ export class MinioStorageService implements StorageService {
       StorageProvider.MINIO,
     )!;
 
+    if (
+      !this.minioConfig.endPoint ||
+      !this.minioConfig.port ||
+      !this.minioConfig.accessKey ||
+      !this.minioConfig.secretKey
+    ) {
+      this.logger.warn(
+        'Minio configuration is incomplete. MinioStorageService will not be initialized properly.',
+      );
+    }
+
     this.minioClient = new Minio.Client({
       endPoint: this.minioConfig.endPoint,
       port: this.minioConfig.port,

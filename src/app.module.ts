@@ -41,7 +41,7 @@ import envFile from './config/env.loader';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: envFile,
-      load: [dbConfig, minioConfig, jwtConfig, refreshJwtConfig, stripeConfig],
+      load: [dbConfig, jwtConfig, refreshJwtConfig, stripeConfig],
     }),
 
     TypeOrmModule.forRootAsync({
