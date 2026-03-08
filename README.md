@@ -4,6 +4,16 @@ A full-featured e-commerce backend built with **NestJS**, **TypeORM**, and **Pos
 
 ---
 
+## Live Demo
+
+| Link | Description |
+|---|---|
+| [API Docs (Swagger)](https://ecommerce-nest-coral.vercel.app/api/docs) | Interactive API documentation |
+| [Payment Test Page](https://ecommerce-nest-coral.vercel.app/payment.html) | Test Stripe payment flow (use card `4242 4242 4242 4242`) |
+| [Mail Inbox Viewer](https://ecommerce-nest-coral.vercel.app/mail-inbox.html) | Preview transactional emails sent via Mailtrap |
+
+---
+
 ## Features
 
 - **Authentication** — JWT access + refresh token strategy, bcrypt password hashing
