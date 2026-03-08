@@ -47,7 +47,10 @@ import envFile from './config/env.loader';
     TypeOrmModule.forRootAsync({
       useFactory: dbConfig,
     }),
-    StorageModule.register(StorageProvider.MINIO),
+    StorageModule.register(
+      (process.env.STORAGE_PROVIDER as StorageProvider) ||
+        StorageProvider.LOCAL,
+    ),
     MailModule,
     AddressModule,
     EventEmitterModule.forRoot(),
