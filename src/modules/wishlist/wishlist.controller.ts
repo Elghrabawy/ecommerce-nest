@@ -12,26 +12,32 @@ import { WishlistService } from './wishlist.service';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { User } from '../user/entities/user.entity';
 import Auth from '../auth/decorators/auth.decorator';
-import { Wishlist } from './entities/wishlist.entity';
-import { Product } from '../product/entities/product.entity';
 import { ResponseInterceptor } from '../../common';
+import {
+  WishlistCheckDto,
+  WishlistCountDto,
+  WishlistProductResponseDto,
+  WishlistResponseDto,
+} from './dto';
 
 @ApiTags('Wishlist')
 @Controller('wishlist')
 @Auth()
-@UseInterceptors(ResponseInterceptor<Wishlist | Product[]>)
+@UseInterceptors(ResponseInterceptor<any>)
 export class WishlistController {
   constructor(private readonly wishlistService: WishlistService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get user wishlist' })
-  async getWishlist(@CurrentUser() user: User): Promise<Wishlist> {
+  async getWishlist(@CurrentUser() user: User): Promise<WishlistResponseDto> {
     return this.wishlistService.getUserWishlist(user.id);
   }
 
   @Get('products')
   @ApiOperation({ summary: 'Get wishlist products with full details' })
-  async getWishlistProducts(@CurrentUser() user: User): Promise<Product[]> {
+  async getWishlistProducts(
+    @CurrentUser() user: User,
+  ): Promise<WishlistProductResponseDto[]> {
     return this.wishlistService.getWishlistProducts(user.id);
   }
 
@@ -40,7 +46,7 @@ export class WishlistController {
   async addToWishlist(
     @Param('productId', ParseIntPipe) productId: number,
     @CurrentUser() user: User,
-  ): Promise<{ message: string; wishlist: Wishlist }> {
+  ): Promise<WishlistResponseDto> {
     return this.wishlistService.addToWishlist(user.id, productId);
   }
 
@@ -49,7 +55,7 @@ export class WishlistController {
   async removeFromWishlist(
     @Param('productId', ParseIntPipe) productId: number,
     @CurrentUser() user: User,
-  ): Promise<{ message: string; wishlist: Wishlist }> {
+  ): Promise<WishlistResponseDto> {
     return this.wishlistService.removeFromWishlist(user.id, productId);
   }
 
@@ -66,15 +72,13 @@ export class WishlistController {
   async isInWishlist(
     @Param('productId', ParseIntPipe) productId: number,
     @CurrentUser() user: User,
-  ): Promise<{ isInWishlist: boolean }> {
+  ): Promise<WishlistCheckDto> {
     return this.wishlistService.isInWishlist(user.id, productId);
   }
 
   @Get('count')
   @ApiOperation({ summary: 'Get wishlist items count' })
-  async getWishlistCount(
-    @CurrentUser() user: User,
-  ): Promise<{ count: number }> {
+  async getWishlistCount(@CurrentUser() user: User): Promise<WishlistCountDto> {
     return this.wishlistService.getWishlistCount(user.id);
   }
 }
